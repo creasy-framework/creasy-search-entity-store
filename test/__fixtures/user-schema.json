@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "properties": {
+    "userId": {
+      "type": "integer"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "titles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reportToUserId": {
+      "type": "integer",
+      "refType": "User"
+    },
+    "organizationIds": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "refType": "Organization"
+      }
+    }
+  },
+  "required": [ "userId", "displayName", "organizationId" ]
+}

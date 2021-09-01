@@ -1,0 +1,13 @@
+{
+  "title": "Organization",
+  "type": "object",
+  "properties": {
+    "organizationId": {
+      "type": "integer"
+    },
+    "displayName": {
+      "type": "string"
+    }
+  },
+  "required": [ "organizationId" ]
+}
