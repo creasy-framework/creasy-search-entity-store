@@ -1,5 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
-import { ERROR_SCHEMA_NOT_FOUND } from './Constants';
+import { ERROR_SCHEMA_NOT_FOUND } from '../Constants';
 
 export interface EntitySchemaNotFoundExceptionContext {
   entityType: string;

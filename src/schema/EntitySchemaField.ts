@@ -1,4 +1,4 @@
-import { EntityJSONSchemaField } from './Types';
+import { EntityJSONSchemaField, EntityJSONSchemaPrimitiveType } from './Types';
 
 export class EntitySchemaField implements EntitySchemaField {
   private readonly name: string;
@@ -12,9 +12,9 @@ export class EntitySchemaField implements EntitySchemaField {
     return this.name;
   }
 
-  getType(): string {
+  getType(): EntityJSONSchemaPrimitiveType {
     if (this.isArrayField()) {
-      return this.metadata.items?.type as string;
+      return this.metadata.items.type as EntityJSONSchemaPrimitiveType;
     }
     return this.metadata.type;
   }

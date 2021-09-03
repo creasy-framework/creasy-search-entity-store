@@ -56,6 +56,10 @@ export class EntitySchema {
     return this.entityType;
   }
 
+  getFields() {
+    return this.fields;
+  }
+
   getField(fieldName: string): EntitySchemaField {
     return this.fields.find((field) => field.getName() === fieldName);
   }

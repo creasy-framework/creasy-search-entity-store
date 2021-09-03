@@ -4,7 +4,8 @@ import { InvalidSchemaException } from '../exceptions/InvalidSchemaException';
 import {
   ERROR_INVALID_SCHEMA_MISSING_PROPERTIES,
   ERROR_INVALID_SCHEMA_INVALID_PROPERTY_TYPE,
-} from '../exceptions/constants';
+  ERROR_INVALID_SCHEMA_INVALID_PROPERTY_NAME,
+} from '../Constants';
 import {
   EntitySchemaValidationInterceptor,
   EntityJSONSchemaField,
@@ -38,6 +39,17 @@ export class EntityPropertyValidationInterceptor
         this.logger.error(`property type "${propertyType}" is invalid`);
         throw new InvalidSchemaException(
           ERROR_INVALID_SCHEMA_INVALID_PROPERTY_TYPE,
+          { propertyType, propertyName: name },
+        );
+      }
+      const refType = (property as EntityJSONSchemaField).refType;
+      if (!refType) return;
+      if (
+        (propertyType === 'array' && !name.endsWith('Ids')) ||
+        !name.endsWith('Id')
+      ) {
+        throw new InvalidSchemaException(
+          ERROR_INVALID_SCHEMA_INVALID_PROPERTY_NAME,
           { propertyType, propertyName: name },
         );
       }
