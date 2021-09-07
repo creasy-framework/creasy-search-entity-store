@@ -1,4 +1,4 @@
-import { Controller, Post, Res } from '@nestjs/common';
+import { Controller, Get, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { EntityStoreGraphQLService } from './EntityStoreGraphQLService';
 import { PlainBody } from '../decorators';
@@ -13,5 +13,11 @@ export class EntityStoreGraphQLController {
   ): Promise<void> {
     const result = await this.service.execute(query);
     response.json(result);
+  }
+
+  @Get('schema')
+  async schema(@Res() response: Response): Promise<void> {
+    const result = await this.service.getSchema();
+    response.send(result);
   }
 }
