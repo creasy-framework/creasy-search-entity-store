@@ -18,8 +18,12 @@ export class EntityStoreGraphQLSchemaQueryField extends EntityStoreGraphQLSchema
   }
   toString() {
     const argumentName = this.entitySchemaField.getName();
-    const argumentType = this.mapPrimitiveType(this.entitySchemaField.getType());
-    return `${this.entityType}(${argumentName}: ${argumentType}): ${this.entityType}`;
+    const argumentType = this.mapPrimitiveType(
+      this.entitySchemaField.getType(),
+    );
+    return `${
+      this.entityType.charAt(0).toLowerCase() + this.entityType.slice(1)
+    }(${argumentName}: ${argumentType}): ${this.entityType}`;
   }
 }
 
@@ -37,14 +41,12 @@ export class EntityStoreGraphQLSchemaRefField extends EntityStoreGraphQLSchemaTy
   toString() {
     const argumentName = this.entitySchemaField.getName();
     const isArray = this.entitySchemaField.isArrayField();
-    const mappedType = this.mapPrimitiveType(this.entitySchemaField.getType());
     const refType = this.entitySchemaField.getRefEntityType();
-    const argumentType = isArray ? `[${mappedType}]` : mappedType;
     const returnType = isArray ? `[${refType}]` : refType;
     const name = isArray
       ? argumentName.substr(0, argumentName.length - 3)
       : argumentName.substr(0, argumentName.length - 2);
-    return `${name}(${argumentName}: ${argumentType}): ${returnType}`;
+    return `${name}: ${returnType}`;
   }
 }
 

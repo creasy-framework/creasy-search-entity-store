@@ -3,7 +3,7 @@
   "type": "object",
   "properties": {
     "organizationId": {
-      "type": "integer"
+      "type": "string"
     },
     "displayName": {
       "type": "string"

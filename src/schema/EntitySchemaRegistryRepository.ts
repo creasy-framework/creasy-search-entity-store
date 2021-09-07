@@ -16,6 +16,20 @@ export class EntitySchemaRegistryRepository {
     });
   }
 
+  async getLatestSchemas(): Promise<EntitySchemaDocument[]> {
+    const aggregation = this.entitySchemaModel.aggregate([
+      {
+        $group: {
+          _id: '$entityType',
+          version: { $max: '$version' },
+          data: { $max: '$$ROOT' },
+        },
+      },
+    ]);
+    const docs = await aggregation.exec();
+    return docs.map(({ data }) => data);
+  }
+
   async getSchema(
     entityType: string,
     version: number,

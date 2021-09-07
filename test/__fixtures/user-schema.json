@@ -2,7 +2,7 @@
   "type": "object",
   "properties": {
     "userId": {
-      "type": "integer"
+      "type": "string"
     },
     "displayName": {
       "type": "string"
@@ -14,13 +14,13 @@
       }
     },
     "reportToUserId": {
-      "type": "integer",
+      "type": "string",
       "refType": "User"
     },
     "organizationIds": {
       "type": "array",
       "items": {
-        "type": "integer",
+        "type": "string",
         "refType": "Organization"
       }
     }

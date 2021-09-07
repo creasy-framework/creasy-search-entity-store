@@ -22,21 +22,21 @@ describe('EntityStoreGraphQLSchemaGenerator', () => {
 
   it('should generate graphql schema', () => {
     const expected = `type Query {
-  User(userId: Integer): User
-  Organization(organizationId: Integer): Organization
+  user(userId: String): User
+  organization(organizationId: String): Organization
 }
 type User {
-  userId: Integer
+  userId: String
   displayName: String
   titles: [String]
-  reportToUser(reportToUserId: Integer): User
-  organization(organizationIds: [Integer]): [Organization]
-  User_by_reportToUserId(reportToUserId: Integer): [User]
+  reportToUser: User
+  organization: [Organization]
+  User_by_reportToUserId(reportToUserId: String): [User]
 }
 type Organization {
-  organizationId: Integer
+  organizationId: String
   displayName: String
-  User_by_organizationIds(organizationIds: [Integer]): [User]
+  User_by_organizationIds(organizationIds: [String]): [User]
 }
 `;
     expect(

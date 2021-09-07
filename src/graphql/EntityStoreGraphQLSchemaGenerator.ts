@@ -39,7 +39,7 @@ export class EntityStoreGraphQLSchemaGenerator {
     }, {});
   }
 
-  generate(entitySchemas: EntitySchema[]) {
+  generate(entitySchemas: EntitySchema[]): string {
     const queryType = new EntityStoreGraphQLSchemaQueryType(entitySchemas);
     const typeMap = this.getGraphQLTypeMap(entitySchemas);
 
@@ -55,6 +55,6 @@ export class EntityStoreGraphQLSchemaGenerator {
       (acc, type) => `${acc}${type.toString()}${OS.EOL}`,
       `${queryType.toString()}${OS.EOL}`,
     );
-    return schemaAsString;
+    return schemaAsString as string;
   }
 }

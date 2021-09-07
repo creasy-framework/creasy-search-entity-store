@@ -29,6 +29,6 @@ import {
     EntitySchemaRegistryService,
     EntitySchemaRegistryRepository,
   ],
-  exports: [EntitySchemaRegistryService],
+  exports: [EntitySchemaRegistryRepository],
 })
 export class EntitySchemaRegistryModule {}

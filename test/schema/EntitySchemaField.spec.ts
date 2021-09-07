@@ -1,7 +1,7 @@
 import userSchema from '../__fixtures/user-schema.json';
 import { EntityJSONSchemaField, EntitySchemaField } from '../../src/schema';
 
-describe('JSONEntitySchemaField', () => {
+describe('EntitySchemaField', () => {
   const createTypeByFieldName = (fieldName: string) => {
     const { properties } = userSchema;
     return new EntitySchemaField(
@@ -22,7 +22,7 @@ describe('JSONEntitySchemaField', () => {
       expect(primitiveField.getName()).toBe(fieldName);
     });
     it('getType returns correct field type', () => {
-      expect(primitiveField.getType()).toBe('integer');
+      expect(primitiveField.getType()).toBe('string');
     });
   });
   describe('ref field', () => {
@@ -38,7 +38,7 @@ describe('JSONEntitySchemaField', () => {
       expect(refField.getName()).toBe(fieldName);
     });
     it('getType returns correct field type', () => {
-      expect(refField.getType()).toBe('integer');
+      expect(refField.getType()).toBe('string');
     });
     it('getRefEntityType returns correct ref field entity type', () => {
       expect(refField.getRefEntityType()).toBe('User');
@@ -73,7 +73,7 @@ describe('JSONEntitySchemaField', () => {
       expect(refArrayField.getName()).toBe(fieldName);
     });
     it('getType returns correct field type', () => {
-      expect(refArrayField.getType()).toBe('integer');
+      expect(refArrayField.getType()).toBe('string');
     });
     it('getRefEntityType returns correct ref field entity type', () => {
       expect(refArrayField.getRefEntityType()).toBe('Organization');

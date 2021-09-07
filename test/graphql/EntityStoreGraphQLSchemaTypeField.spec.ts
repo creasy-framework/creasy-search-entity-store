@@ -31,7 +31,7 @@ describe('EntityStoreGraphQLSchemaType', () => {
       const field = new EntityStoreGraphQLSchemaRefField(
         new EntitySchemaField('authorId', { type: 'string', refType: 'User' }),
       );
-      const expected = 'author(authorId: String): User';
+      const expected = 'author: User';
       expect(field.toString()).toBe(expected);
     });
     it('toString() should return correct query function for ref array', () => {
@@ -41,7 +41,7 @@ describe('EntityStoreGraphQLSchemaType', () => {
           items: { type: 'string', refType: 'User' },
         }),
       );
-      const expected = 'author(authorIds: [String]): [User]';
+      const expected = 'author: [User]';
       expect(field.toString()).toBe(expected);
     });
   });
@@ -74,7 +74,7 @@ describe('EntityStoreGraphQLSchemaType', () => {
         'User',
         new EntitySchemaField('userId', { type: 'string' }),
       );
-      const expected = 'User(userId: String): User';
+      const expected = 'user(userId: String): User';
       expect(field.toString()).toBe(expected);
     });
   });

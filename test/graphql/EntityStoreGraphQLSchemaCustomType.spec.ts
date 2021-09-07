@@ -38,8 +38,8 @@ describe('EntityStoreGraphQLSchemaCustomType', () => {
     expect(userType.toString()).toBe(`type User {
   userId: String
   tags: [String]
-  address(addressId: String): Address
-  collaborator(collaboratorIds: [String]): [Collaborator]
+  address: Address
+  collaborator: [Collaborator]
   Book_by_authorId(authorId: String): [Book]
 }`);
   });
