@@ -31,12 +31,12 @@ type User {
   titles: [String]
   reportToUser: User
   organization: [Organization]
-  User_by_reportToUserId(reportToUserId: String): [User]
+  User_by_reportToUserId: [User]
 }
 type Organization {
   organizationId: String
   displayName: String
-  User_by_organizationIds(organizationIds: [String]): [User]
+  User_by_organizationIds: [User]
 }
 `;
     expect(

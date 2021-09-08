@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { graphql, buildSchema } from 'graphql';
+import {
+  graphql,
+  buildSchema,
+  GraphQLSchema,
+  ExecutionResult,
+  GraphQLObjectType,
+} from 'graphql';
 import { EntitySchema, EntitySchemaRegistryRepository } from '../schema';
 import { EntityStoreGraphQLSchemaGenerator } from './EntityStoreGraphQLSchemaGenerator';
 import { EntityStoreGraphQLResolverGenerator } from './EntityStoreGraphQLResolverGenerator';
@@ -12,7 +18,7 @@ export class EntityStoreGraphQLService {
     private resolverGenerator: EntityStoreGraphQLResolverGenerator,
   ) {}
 
-  private async getEntitySchemas() {
+  private async getEntitySchemas(): Promise<EntitySchema[]> {
     const schemas = await this.entitySchemaRepository.getLatestSchemas();
     const entitySchemas = schemas.map((schema) =>
       EntitySchema.fromJson(schema),
@@ -20,11 +26,27 @@ export class EntityStoreGraphQLService {
     return entitySchemas;
   }
 
-  async execute(query: string) {
+  private getEntityTypes(
+    entitySchemas: EntitySchema[],
+    graphQLSchema: GraphQLSchema,
+  ): GraphQLObjectType[] {
+    return entitySchemas.map(
+      (entitySchema) =>
+        graphQLSchema.getTypeMap()[
+          entitySchema.getEntityType()
+        ] as GraphQLObjectType,
+    );
+  }
+
+  async execute(query: string): Promise<ExecutionResult> {
     const entitySchemas = await this.getEntitySchemas();
     const graphQLSchemaAsString = this.schemaGenerator.generate(entitySchemas);
-    const resolvers = this.resolverGenerator.generate(entitySchemas);
     const graphQLSchema = buildSchema(graphQLSchemaAsString);
+    const entityGraphQLTypes = this.getEntityTypes(
+      entitySchemas,
+      graphQLSchema,
+    );
+    const resolvers = this.resolverGenerator.generate(entityGraphQLTypes);
     return await graphql(graphQLSchema, query, resolvers);
   }
 

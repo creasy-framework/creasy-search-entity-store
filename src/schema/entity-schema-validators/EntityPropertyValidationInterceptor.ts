@@ -42,6 +42,15 @@ export class EntityPropertyValidationInterceptor
           { propertyType, propertyName: name },
         );
       }
+      if (name.indexOf('_') != -1) {
+        throw new InvalidSchemaException(
+          ERROR_INVALID_SCHEMA_INVALID_PROPERTY_NAME,
+          {
+            propertyType,
+            propertyName: name,
+          },
+        );
+      }
       const refType = (property as EntityJSONSchemaField).refType;
       if (!refType) return;
       if (
@@ -50,7 +59,10 @@ export class EntityPropertyValidationInterceptor
       ) {
         throw new InvalidSchemaException(
           ERROR_INVALID_SCHEMA_INVALID_PROPERTY_NAME,
-          { propertyType, propertyName: name },
+          {
+            propertyType,
+            propertyName: name,
+          },
         );
       }
     });

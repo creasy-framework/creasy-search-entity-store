@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 const MockDataStorage = {
   User: [
@@ -53,7 +53,10 @@ export class EntityStoreRepository {
     }Id`;
     return Promise.resolve(data.find((row) => row[idField] === id));
   };
-  fetchByIds = (entityType: string, ids: string[] | number[]): Promise<any> => {
+  fetchByIds = (
+    entityType: string,
+    ids: string[] | number[],
+  ): Promise<any[]> => {
     const data = MockDataStorage[entityType];
     const idField = `${
       entityType.charAt(0).toLowerCase() + entityType.slice(1)
@@ -61,5 +64,20 @@ export class EntityStoreRepository {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return Promise.resolve(data.filter((row) => ids.includes(row[idField])));
+  };
+  fetchByRefId = (
+    entityType: string,
+    refFieldName: string,
+    refId: string | number,
+  ): Promise<any[]> => {
+    const data = MockDataStorage[entityType];
+    return Promise.resolve(
+      data.filter((row) => {
+        if (row[refFieldName] instanceof Array) {
+          return row[refFieldName].includes(refId);
+        }
+        return row[refFieldName] == refId;
+      }),
+    );
   };
 }

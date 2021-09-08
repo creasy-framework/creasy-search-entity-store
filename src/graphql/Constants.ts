@@ -5,3 +5,5 @@ export const FIELD_TYPE_SORT_PRIORITIES = {
 };
 
 export const GRAPHQL_SCHEMA_FIELD_INDENT = '  ';
+
+export const DEPENDENT_FIELD_SEPARATOR = '_by_';

@@ -40,7 +40,7 @@ describe('EntityStoreGraphQLSchemaCustomType', () => {
   tags: [String]
   address: Address
   collaborator: [Collaborator]
-  Book_by_authorId(authorId: String): [Book]
+  Book_by_authorId: [Book]
 }`);
   });
 });

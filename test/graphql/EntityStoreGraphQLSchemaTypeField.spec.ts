@@ -51,7 +51,7 @@ describe('EntityStoreGraphQLSchemaType', () => {
         'Book',
         new EntitySchemaField('authorId', { type: 'string', refType: 'User' }),
       );
-      const expected = 'Book_by_authorId(authorId: String): [Book]';
+      const expected = 'Book_by_authorId: [Book]';
       expect(field.toString()).toBe(expected);
     });
 
@@ -63,7 +63,7 @@ describe('EntityStoreGraphQLSchemaType', () => {
           items: { type: 'string', refType: 'User' },
         }),
       );
-      const expected = 'Book_by_authorIds(authorIds: [String]): [Book]';
+      const expected = 'Book_by_authorIds: [Book]';
       expect(field.toString()).toBe(expected);
     });
   });

@@ -58,10 +58,7 @@ export class EntityStoreGraphQLSchemaRelationalField extends EntityStoreGraphQLS
   }
 
   toString() {
-    const isArray = this.entitySchemaField.isArrayField();
     const name = this.entitySchemaField.getName();
-    const mappedType = this.mapPrimitiveType(this.entitySchemaField.getType());
-    const argumentType = isArray ? `[${mappedType}]` : mappedType;
-    return `${this.entityType}_by_${name}(${name}: ${argumentType}): [${this.entityType}]`;
+    return `${this.entityType}_by_${name}: [${this.entityType}]`;
   }
 }
