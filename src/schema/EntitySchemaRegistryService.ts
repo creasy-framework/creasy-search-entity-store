@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { EntitySchema } from './EntitySchema';
 import { EntitySchemaRegistryRepository } from './EntitySchemaRegistryRepository';
-import { EntitySchemaValidator } from './entity-schema-validators/EntitySchemaValidator';
+import { EntitySchemaValidator } from './validators/EntitySchemaValidator';
 import { EntitySchemaNotFoundException } from './exceptions/EntitySchemaNotFoundException';
 import { EntityJSONSchema } from './Types';
 

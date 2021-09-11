@@ -1,4 +1,5 @@
 import { EntityJSONSchemaPrimitiveType, EntitySchemaField } from '../schema';
+import { DEPENDENT_FIELD_SEPARATOR } from './Constants';
 
 export abstract class EntityStoreGraphQLSchemaTypeField {
   protected entitySchemaField: EntitySchemaField;
@@ -59,6 +60,6 @@ export class EntityStoreGraphQLSchemaRelationalField extends EntityStoreGraphQLS
 
   toString() {
     const name = this.entitySchemaField.getName();
-    return `${this.entityType}_by_${name}: [${this.entityType}]`;
+    return `${this.entityType}${DEPENDENT_FIELD_SEPARATOR}${name}: [${this.entityType}]`;
   }
 }

@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { EntitySchemaRegistryController } from './EntitySchemaRegistryController';
 import { EntitySchemaRegistryService } from './EntitySchemaRegistryService';
-import { EntitySchemaValidator } from './entity-schema-validators/EntitySchemaValidator';
+import { EntitySchemaValidator } from './validators/EntitySchemaValidator';
 import { EntitySchemaRegistryRepository } from './EntitySchemaRegistryRepository';
 import {
   EntitySchemaDocument,

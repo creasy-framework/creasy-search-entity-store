@@ -1,7 +1,7 @@
 import { EntityStoreGraphQLSchemaGenerator } from '../../src/graphql';
 import { EntityJSONSchema, EntitySchema } from '../../src/schema';
-import userSchema from '../__fixtures/user-schema.json';
-import orgSchema from '../__fixtures/organization-schema.json';
+import userSchema from '../__fixtures/entity-schemas/user-schema.json';
+import orgSchema from '../__fixtures/entity-schemas/organization-schema.json';
 
 describe('EntityStoreGraphQLSchemaGenerator', () => {
   const schemaGenerator = new EntityStoreGraphQLSchemaGenerator();

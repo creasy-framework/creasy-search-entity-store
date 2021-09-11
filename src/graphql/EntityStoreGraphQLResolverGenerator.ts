@@ -1,48 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { GraphQLField, GraphQLObjectType } from 'graphql';
+import { GraphQLField, GraphQLObjectType, GraphQLList } from 'graphql';
 import { EntityStoreRepository } from '../store';
 import { DEPENDENT_FIELD_SEPARATOR } from './Constants';
-
-export interface EntityResolver {
-  [key: string]: (args: any) => Promise<any>;
-}
+import { EntityResolver } from './Types';
 
 @Injectable()
 export class EntityStoreGraphQLResolverGenerator {
   constructor(private entityRepository: EntityStoreRepository) {}
   private getActualType(field: GraphQLField<any, any>) {
     return field.type.toString().replace('[', '').replace(']', '');
-  }
-
-  private isArray(refField: GraphQLField<any, any>) {
-    return (
-      refField.type.toString().startsWith('[') &&
-      refField.type.toString().endsWith(']')
-    );
-  }
-
-  private createResolverForEntityList(
-    field: GraphQLField<any, any>,
-    entities: any[],
-    entityTypes: GraphQLObjectType[],
-  ) {
-    if (!entities || entities.length === 0) return null;
-    const entityType = entityTypes.find(
-      (t) => t.name === this.getActualType(field),
-    );
-    const refs = this.getRefFields(entityType, entityTypes);
-    return entities.map((entity) => {
-      const nestedResolvers = refs.reduce((next, ref) => {
-        return {
-          ...next,
-          [ref.name]: this.createResolverForField(ref, entityTypes, entity),
-        };
-      }, {});
-      return {
-        ...entity,
-        ...nestedResolvers,
-      };
-    });
   }
 
   private async resolveEntityList(
@@ -56,7 +22,7 @@ export class EntityStoreGraphQLResolverGenerator {
       this.getActualType(refField),
       ids,
     );
-    return this.createResolverForEntityList(refField, entities, entityTypes);
+    return this.createResolverForEntityList(refField, entityTypes, entities);
   }
 
   private async resolveEntity(
@@ -109,13 +75,37 @@ export class EntityStoreGraphQLResolverGenerator {
     );
   }
 
+  private createResolverForEntityList(
+    field: GraphQLField<any, any>,
+    entityTypes: GraphQLObjectType[],
+    entities: any[],
+  ) {
+    if (!entities || entities.length === 0) return null;
+    const entityType = entityTypes.find(
+      (t) => t.name === this.getActualType(field),
+    );
+    const refs = this.getRefFields(entityType, entityTypes);
+    return entities.map((entity) => {
+      const nestedResolvers = refs.reduce((next, ref) => {
+        return {
+          ...next,
+          [ref.name]: this.createResolverForField(ref, entityTypes, entity),
+        };
+      }, {});
+      return {
+        ...entity,
+        ...nestedResolvers,
+      };
+    });
+  }
+
   private createResolverForField(
     refField: GraphQLField<any, any>,
     entityTypes: GraphQLObjectType[],
     parent: any,
   ) {
     const resolver = async () => {
-      const isArrayField = this.isArray(refField);
+      const isArrayField = refField.type instanceof GraphQLList;
       if (isArrayField) {
         return await this.resolveEntityList(refField, entityTypes, parent);
       } else {
@@ -141,8 +131,8 @@ export class EntityStoreGraphQLResolverGenerator {
       );
       return this.createResolverForEntityList(
         dependentField,
-        entities,
         entityTypes,
+        entities,
       );
     };
     return resolver;
@@ -155,6 +145,7 @@ export class EntityStoreGraphQLResolverGenerator {
     const resolver = async (args: any) => {
       const entityIdField = `${entityType.name.toLowerCase()}Id`;
       const id = args[entityIdField];
+      if (!id) return null;
       const entity = await this.entityRepository.fetchById(entityType.name, id);
       if (!entity) return null;
       const refs = this.getRefFields(entityType, entityTypes);

@@ -1,4 +1,4 @@
-import userSchema from '../__fixtures/user-schema.json';
+import userSchema from '../__fixtures/entity-schemas/user-schema.json';
 import { EntityJSONSchemaField, EntitySchemaField } from '../../src/schema';
 
 describe('EntitySchemaField', () => {

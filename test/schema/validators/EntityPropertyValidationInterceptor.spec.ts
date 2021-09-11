@@ -1,5 +1,5 @@
-import userSchema from '../../__fixtures/user-schema.json';
-import { EntityPropertyValidationInterceptor } from '../../../src/schema/entity-schema-validators/EntityPropertyValidationInterceptor';
+import userSchema from '../../__fixtures/entity-schemas/user-schema.json';
+import { EntityPropertyValidationInterceptor } from '../../../src/schema/validators/EntityPropertyValidationInterceptor';
 import { EntityJSONSchema, EntitySchema } from '../../../src/schema';
 import { InvalidSchemaException } from '../../../src/schema/exceptions/InvalidSchemaException';
 import {

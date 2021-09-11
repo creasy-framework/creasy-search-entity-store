@@ -9,7 +9,7 @@ import {
   EntityJSONSchema,
 } from '../../src/schema';
 import { TestMongooseModule } from '../__utilities/TestMongooseModule';
-import userSchema from '../__fixtures/user-schema.json';
+import userSchema from '../__fixtures/entity-schemas/user-schema.json';
 import { EntitySchemaNotFoundException } from '../../src/schema/exceptions/EntitySchemaNotFoundException';
 
 describe('EntitySchemaRegistryService', () => {

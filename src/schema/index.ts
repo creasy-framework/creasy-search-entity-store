@@ -6,4 +6,4 @@ export * from './EntitySchemaRegistryService';
 export * from './EntitySchemaRegistryRepository';
 export * from './EntitySchemaRegistryController';
 export * from './EntitySchemaRegistryModule';
-export * from './entity-schema-validators/EntitySchemaValidator';
+export * from './validators/EntitySchemaValidator';

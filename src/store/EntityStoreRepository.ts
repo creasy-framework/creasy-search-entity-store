@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 const MockDataStorage = {
   User: [
@@ -13,6 +13,7 @@ const MockDataStorage = {
       displayName: 'User B',
       organizationIds: ['3'],
       tags: ['S', 'B'],
+      supervisorId: '1',
     },
   ],
   Organization: [
