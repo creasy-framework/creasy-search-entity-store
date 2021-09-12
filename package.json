@@ -31,6 +31,7 @@
     "@types/json-schema": "^7.0.9",
     "apollo-server-express": "^3.3.0",
     "graphql": "^15.5.2",
+    "kafkajs": "^1.15.0",
     "mongodb-memory-server": "^7.3.6",
     "mongoose": "^6.0.2",
     "reflect-metadata": "^0.1.13",
