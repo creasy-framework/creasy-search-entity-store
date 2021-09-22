@@ -28,6 +28,7 @@
     "@nestjs/microservices": "^8.0.6",
     "@nestjs/mongoose": "^8.0.1",
     "@nestjs/platform-express": "^8.0.6",
+    "@rob3000/nestjs-kafka": "^1.4.1",
     "@types/json-schema": "^7.0.9",
     "apollo-server-express": "^3.3.0",
     "graphql": "^15.5.2",

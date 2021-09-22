@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   graphql,
   buildSchema,
@@ -9,9 +9,16 @@ import {
 import { EntitySchema, EntitySchemaRegistryRepository } from '../schema';
 import { EntityStoreGraphQLSchemaGenerator } from './EntityStoreGraphQLSchemaGenerator';
 import { EntityStoreGraphQLResolverGenerator } from './EntityStoreGraphQLResolverGenerator';
+import { ENTITY_SCHEMA_UPDATED, Observe, On } from '../event';
+import { EntityResolver } from './Types';
 
+@Observe([ENTITY_SCHEMA_UPDATED])
 @Injectable()
 export class EntityStoreGraphQLService {
+  private cachedResolver: EntityResolver;
+  private cachedGraphQLSchema: GraphQLSchema;
+  private cachedGraphQLSchemaString: string;
+
   constructor(
     private entitySchemaRepository: EntitySchemaRegistryRepository,
     private schemaGenerator: EntityStoreGraphQLSchemaGenerator,
@@ -39,19 +46,30 @@ export class EntityStoreGraphQLService {
   }
 
   async execute(query: string): Promise<ExecutionResult> {
-    const entitySchemas = await this.getEntitySchemas();
-    const graphQLSchemaAsString = this.schemaGenerator.generate(entitySchemas);
-    const graphQLSchema = buildSchema(graphQLSchemaAsString);
-    const entityGraphQLTypes = this.getEntityTypes(
-      entitySchemas,
-      graphQLSchema,
-    );
-    const resolvers = this.resolverGenerator.generate(entityGraphQLTypes);
-    return await graphql(graphQLSchema, query, resolvers);
+    if (!this.cachedGraphQLSchema || !this.cachedResolver) {
+      await this.refreshCache();
+    }
+    return await graphql(this.cachedGraphQLSchema, query, this.cachedResolver);
   }
 
   async getSchema() {
+    if (!this.cachedGraphQLSchemaString) {
+      await this.refreshCache();
+    }
+    return this.cachedGraphQLSchemaString;
+  }
+
+  @On(ENTITY_SCHEMA_UPDATED)
+  private async refreshCache() {
+    Logger.log('Generating GraphQL schema and resolvers');
     const entitySchemas = await this.getEntitySchemas();
-    return this.schemaGenerator.generate(entitySchemas);
+    this.cachedGraphQLSchemaString =
+      this.schemaGenerator.generate(entitySchemas);
+    this.cachedGraphQLSchema = buildSchema(this.cachedGraphQLSchemaString);
+    const entityGraphQLTypes = this.getEntityTypes(
+      entitySchemas,
+      this.cachedGraphQLSchema,
+    );
+    this.cachedResolver = this.resolverGenerator.generate(entityGraphQLTypes);
   }
 }

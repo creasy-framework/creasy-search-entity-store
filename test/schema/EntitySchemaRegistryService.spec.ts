@@ -11,11 +11,13 @@ import {
 import { TestMongooseModule } from '../__utilities/TestMongooseModule';
 import userSchema from '../__fixtures/entity-schemas/user-schema.json';
 import { EntitySchemaNotFoundException } from '../../src/schema/exceptions/EntitySchemaNotFoundException';
+import { EventModule, EventService } from '../../src/event';
 
 describe('EntitySchemaRegistryService', () => {
   let validator: EntitySchemaValidator;
   let repository: EntitySchemaRegistryRepository;
   let service: EntitySchemaRegistryService;
+  let eventService: EventService;
 
   const entitySchema = new EntitySchemaDocument(
     'User',
@@ -35,6 +37,7 @@ describe('EntitySchemaRegistryService', () => {
             schema: EntitySchemaDocumentSchema,
           },
         ]),
+        EventModule,
       ],
       providers: [
         EntitySchemaRegistryRepository,
@@ -50,6 +53,7 @@ describe('EntitySchemaRegistryService', () => {
     service = moduleRef.get<EntitySchemaRegistryService>(
       EntitySchemaRegistryService,
     );
+    eventService = moduleRef.get<EventService>(EventService);
   });
 
   describe('fetch', () => {
@@ -87,6 +91,9 @@ describe('EntitySchemaRegistryService', () => {
     beforeEach(() => {
       jest.spyOn(validator, 'validate').mockImplementation();
       jest.spyOn(repository, 'saveSchema').mockImplementation();
+      jest
+        .spyOn(eventService, 'emit')
+        .mockImplementation(() => Promise.resolve());
     });
     it('do nothing if find duplicated schema', async () => {
       jest
@@ -95,6 +102,7 @@ describe('EntitySchemaRegistryService', () => {
       jest.spyOn(repository, 'saveSchema');
       await service.register('User', entitySchema as EntityJSONSchema);
       expect(repository.saveSchema).not.toHaveBeenCalled();
+      expect(eventService.emit).not.toHaveBeenCalled();
     });
     it('register new schema with version 1', async () => {
       jest
@@ -111,6 +119,7 @@ describe('EntitySchemaRegistryService', () => {
           version: 1,
         }),
       );
+      expect(eventService.emit).toHaveBeenCalled();
     });
     it('register updated schema with increased version', async () => {
       jest
@@ -127,6 +136,7 @@ describe('EntitySchemaRegistryService', () => {
           version: 2,
         }),
       );
+      expect(eventService.emit).toHaveBeenCalled();
     });
   });
 });

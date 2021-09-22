@@ -9,6 +9,7 @@ import {
   EntitySchemaDocument,
   EntitySchemaDocumentSchema,
 } from './EntitySchemaDocument';
+import { EventModule } from '../event';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import {
         schema: EntitySchemaDocumentSchema,
       },
     ]),
+    EventModule,
   ],
   controllers: [EntitySchemaRegistryController],
   providers: [

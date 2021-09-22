@@ -4,12 +4,14 @@ import { EntitySchemaRegistryRepository } from './EntitySchemaRegistryRepository
 import { EntitySchemaValidator } from './validators/EntitySchemaValidator';
 import { EntitySchemaNotFoundException } from './exceptions/EntitySchemaNotFoundException';
 import { EntityJSONSchema } from './Types';
+import { ENTITY_SCHEMA_UPDATED, EventService } from '../event';
 
 @Injectable()
 export class EntitySchemaRegistryService {
   constructor(
     private entitySchemaRepository: EntitySchemaRegistryRepository,
     private validator: EntitySchemaValidator,
+    private eventService: EventService,
   ) {}
 
   async fetch(entityType: string, version?: number): Promise<EntitySchema> {
@@ -40,16 +42,20 @@ export class EntitySchemaRegistryService {
     }
 
     const latestVersion = await this.getLatestSchemaVersion(entityType);
+    const nextVersion = latestVersion + 1;
     const entitySchema = new EntitySchema(
       entityType,
       schema,
       Date.now(),
-      latestVersion + 1,
+      nextVersion,
       fingerprint,
     );
 
     this.validator.validate(entitySchema);
     await this.entitySchemaRepository.saveSchema(entitySchema.toJson());
+    await this.eventService.emit(ENTITY_SCHEMA_UPDATED, [
+      { value: JSON.stringify(entitySchema.toJson()) },
+    ]);
   }
 
   private async getLatestSchemaVersion(entityType: string) {

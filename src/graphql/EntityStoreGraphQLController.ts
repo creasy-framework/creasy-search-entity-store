@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { EntityStoreGraphQLService } from './EntityStoreGraphQLService';
-import { PlainBody } from '../decorators';
+import { PlainBody } from './PlainBodyDecorator';
 
 @Controller('graphql')
 export class EntityStoreGraphQLController {
