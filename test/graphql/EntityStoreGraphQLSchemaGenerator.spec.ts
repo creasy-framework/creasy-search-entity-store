@@ -10,7 +10,7 @@ describe('EntityStoreGraphQLSchemaGenerator', () => {
     'User',
     userSchema as EntityJSONSchema,
     Date.now(),
-    1,
+    2,
   );
 
   const orgEntitySchema = new EntitySchema(
@@ -21,7 +21,8 @@ describe('EntityStoreGraphQLSchemaGenerator', () => {
   );
 
   it('should generate graphql schema', () => {
-    const expected = `type Query {
+    const expected = `# Version: 1-2
+type Query {
   user(userId: String): User
   organization(organizationId: String): Organization
 }

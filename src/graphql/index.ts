@@ -4,3 +4,4 @@ export * from './EntityStoreGraphQLSchemaGenerator';
 export * from './EntityStoreGraphQLResolverGenerator';
 export * from './EntityStoreGraphQLModule';
 export * from './Types';
+export * from './Constants';

@@ -1,4 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import {
   graphql,
   buildSchema,
@@ -9,20 +10,21 @@ import {
 import { EntitySchema, EntitySchemaRegistryRepository } from '../schema';
 import { EntityStoreGraphQLSchemaGenerator } from './EntityStoreGraphQLSchemaGenerator';
 import { EntityStoreGraphQLResolverGenerator } from './EntityStoreGraphQLResolverGenerator';
-import { ENTITY_SCHEMA_UPDATED, Observe, On } from '../event';
 import { EntityResolver } from './Types';
+import { GRAPHQL_SCHEMA_VERSION_CACHE_KEY } from './Constants';
 
-@Observe([ENTITY_SCHEMA_UPDATED])
 @Injectable()
 export class EntityStoreGraphQLService {
   private cachedResolver: EntityResolver;
   private cachedGraphQLSchema: GraphQLSchema;
   private cachedGraphQLSchemaString: string;
+  private lastSchemaVersion: string;
 
   constructor(
     private entitySchemaRepository: EntitySchemaRegistryRepository,
     private schemaGenerator: EntityStoreGraphQLSchemaGenerator,
     private resolverGenerator: EntityStoreGraphQLResolverGenerator,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   private async getEntitySchemas(): Promise<EntitySchema[]> {
@@ -46,20 +48,28 @@ export class EntityStoreGraphQLService {
   }
 
   async execute(query: string): Promise<ExecutionResult> {
-    if (!this.cachedGraphQLSchema || !this.cachedResolver) {
+    const isCacheInvalid = await this.isCacheInvalid();
+    if (isCacheInvalid) {
       await this.refreshCache();
     }
     return await graphql(this.cachedGraphQLSchema, query, this.cachedResolver);
   }
 
   async getSchema() {
-    if (!this.cachedGraphQLSchemaString) {
+    const isCacheInvalid = await this.isCacheInvalid();
+    if (isCacheInvalid) {
       await this.refreshCache();
     }
     return this.cachedGraphQLSchemaString;
   }
 
-  @On(ENTITY_SCHEMA_UPDATED)
+  private async isCacheInvalid() {
+    const schemaVersion = await this.cacheManager.get<string>(
+      GRAPHQL_SCHEMA_VERSION_CACHE_KEY,
+    );
+    return !this.lastSchemaVersion || this.lastSchemaVersion !== schemaVersion;
+  }
+
   private async refreshCache() {
     Logger.log('Generating GraphQL schema and resolvers');
     const entitySchemas = await this.getEntitySchemas();
@@ -71,5 +81,11 @@ export class EntityStoreGraphQLService {
       this.cachedGraphQLSchema,
     );
     this.cachedResolver = this.resolverGenerator.generate(entityGraphQLTypes);
+    this.lastSchemaVersion =
+      this.schemaGenerator.generateVersion(entitySchemas);
+    await this.cacheManager.set<string>(
+      GRAPHQL_SCHEMA_VERSION_CACHE_KEY,
+      this.lastSchemaVersion,
+    );
   }
 }

@@ -1,5 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CACHE_MANAGER, CacheModule } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import {
   EntitySchemaRegistryRepository,
   EntitySchemaValidator,
@@ -11,13 +13,13 @@ import {
 import { TestMongooseModule } from '../__utilities/TestMongooseModule';
 import userSchema from '../__fixtures/entity-schemas/user-schema.json';
 import { EntitySchemaNotFoundException } from '../../src/schema/exceptions/EntitySchemaNotFoundException';
-import { EventModule, EventService } from '../../src/event';
+import { GRAPHQL_SCHEMA_VERSION_CACHE_KEY } from '../../src/graphql';
 
 describe('EntitySchemaRegistryService', () => {
   let validator: EntitySchemaValidator;
   let repository: EntitySchemaRegistryRepository;
   let service: EntitySchemaRegistryService;
-  let eventService: EventService;
+  let cacheManager: Cache;
 
   const entitySchema = new EntitySchemaDocument(
     'User',
@@ -31,13 +33,13 @@ describe('EntitySchemaRegistryService', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [
         TestMongooseModule,
+        CacheModule.register(),
         MongooseModule.forFeature([
           {
             name: EntitySchemaDocument.name,
             schema: EntitySchemaDocumentSchema,
           },
         ]),
-        EventModule,
       ],
       providers: [
         EntitySchemaRegistryRepository,
@@ -53,7 +55,7 @@ describe('EntitySchemaRegistryService', () => {
     service = moduleRef.get<EntitySchemaRegistryService>(
       EntitySchemaRegistryService,
     );
-    eventService = moduleRef.get<EventService>(EventService);
+    cacheManager = moduleRef.get<Cache>(CACHE_MANAGER);
   });
 
   describe('fetch', () => {
@@ -91,9 +93,7 @@ describe('EntitySchemaRegistryService', () => {
     beforeEach(() => {
       jest.spyOn(validator, 'validate').mockImplementation();
       jest.spyOn(repository, 'saveSchema').mockImplementation();
-      jest
-        .spyOn(eventService, 'emit')
-        .mockImplementation(() => Promise.resolve());
+      jest.spyOn(cacheManager, 'del').mockImplementation();
     });
     it('do nothing if find duplicated schema', async () => {
       jest
@@ -102,7 +102,7 @@ describe('EntitySchemaRegistryService', () => {
       jest.spyOn(repository, 'saveSchema');
       await service.register('User', entitySchema as EntityJSONSchema);
       expect(repository.saveSchema).not.toHaveBeenCalled();
-      expect(eventService.emit).not.toHaveBeenCalled();
+      expect(cacheManager.del).not.toHaveBeenCalled();
     });
     it('register new schema with version 1', async () => {
       jest
@@ -119,7 +119,9 @@ describe('EntitySchemaRegistryService', () => {
           version: 1,
         }),
       );
-      expect(eventService.emit).toHaveBeenCalled();
+      expect(cacheManager.del).toHaveBeenCalledWith(
+        GRAPHQL_SCHEMA_VERSION_CACHE_KEY,
+      );
     });
     it('register updated schema with increased version', async () => {
       jest
@@ -136,7 +138,9 @@ describe('EntitySchemaRegistryService', () => {
           version: 2,
         }),
       );
-      expect(eventService.emit).toHaveBeenCalled();
+      expect(cacheManager.del).toHaveBeenCalledWith(
+        GRAPHQL_SCHEMA_VERSION_CACHE_KEY,
+      );
     });
   });
 });

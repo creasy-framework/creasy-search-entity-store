@@ -53,8 +53,16 @@ export class EntityStoreGraphQLSchemaGenerator {
 
     const schemaAsString = Object.values(typeMap).reduce(
       (acc, type) => `${acc}${type.toString()}${OS.EOL}`,
-      `${queryType.toString()}${OS.EOL}`,
+      `# Version: ${this.generateVersion(entitySchemas)}${
+        OS.EOL
+      }${queryType.toString()}${OS.EOL}`,
     );
     return schemaAsString as string;
+  }
+
+  generateVersion(entitySchemas: EntitySchema[]) {
+    return entitySchemas
+      .sort((a, b) => (a.getEntityType() > b.getEntityType() ? 1 : -1))
+      .reduce((v, schema) => `${v ? `${v}-` : v}${schema.getVersion()}`, '');
   }
 }
