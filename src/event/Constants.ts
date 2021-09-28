@@ -1,1 +1,3 @@
-export const ENTITY_SCHEMA_UPDATED = 'ENTITY_SCHEMA_UPDATED';
+export const ENTITY_UPDATE_EVENT = 'EntityUpdate';
+export const ENTITY_SCHEMA_UPDATE_EVENT = 'EntitySchemaUpdate';
+export const FAILED_TO_PROCEED_EVENT = 'FailedToProceedEvent';

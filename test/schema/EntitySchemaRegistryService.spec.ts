@@ -1,7 +1,5 @@
 import { Test } from '@nestjs/testing';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CACHE_MANAGER, CacheModule } from '@nestjs/common';
-import { Cache } from 'cache-manager';
 import {
   EntitySchemaRegistryRepository,
   EntitySchemaValidator,
@@ -13,13 +11,14 @@ import {
 import { TestMongooseModule } from '../__utilities/TestMongooseModule';
 import userSchema from '../__fixtures/entity-schemas/user-schema.json';
 import { EntitySchemaNotFoundException } from '../../src/schema/exceptions/EntitySchemaNotFoundException';
-import { GRAPHQL_SCHEMA_VERSION_CACHE_KEY } from '../../src/graphql';
+import { EventModule, EventService } from '../../src/event';
+import { EntitySchemaRegisterFailedException } from '../../src/schema/exceptions/EntitySchemaRegisterFailedException';
 
 describe('EntitySchemaRegistryService', () => {
   let validator: EntitySchemaValidator;
   let repository: EntitySchemaRegistryRepository;
   let service: EntitySchemaRegistryService;
-  let cacheManager: Cache;
+  let eventService: EventService;
 
   const entitySchema = new EntitySchemaDocument(
     'User',
@@ -33,13 +32,13 @@ describe('EntitySchemaRegistryService', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [
         TestMongooseModule,
-        CacheModule.register(),
         MongooseModule.forFeature([
           {
             name: EntitySchemaDocument.name,
             schema: EntitySchemaDocumentSchema,
           },
         ]),
+        EventModule,
       ],
       providers: [
         EntitySchemaRegistryRepository,
@@ -55,7 +54,7 @@ describe('EntitySchemaRegistryService', () => {
     service = moduleRef.get<EntitySchemaRegistryService>(
       EntitySchemaRegistryService,
     );
-    cacheManager = moduleRef.get<Cache>(CACHE_MANAGER);
+    eventService = moduleRef.get<EventService>(EventService);
   });
 
   describe('fetch', () => {
@@ -93,7 +92,9 @@ describe('EntitySchemaRegistryService', () => {
     beforeEach(() => {
       jest.spyOn(validator, 'validate').mockImplementation();
       jest.spyOn(repository, 'saveSchema').mockImplementation();
-      jest.spyOn(cacheManager, 'del').mockImplementation();
+      jest
+        .spyOn(eventService, 'emit')
+        .mockImplementation(() => Promise.resolve());
     });
     it('do nothing if find duplicated schema', async () => {
       jest
@@ -102,7 +103,7 @@ describe('EntitySchemaRegistryService', () => {
       jest.spyOn(repository, 'saveSchema');
       await service.register('User', entitySchema as EntityJSONSchema);
       expect(repository.saveSchema).not.toHaveBeenCalled();
-      expect(cacheManager.del).not.toHaveBeenCalled();
+      expect(eventService.emit).not.toHaveBeenCalled();
     });
     it('register new schema with version 1', async () => {
       jest
@@ -119,9 +120,7 @@ describe('EntitySchemaRegistryService', () => {
           version: 1,
         }),
       );
-      expect(cacheManager.del).toHaveBeenCalledWith(
-        GRAPHQL_SCHEMA_VERSION_CACHE_KEY,
-      );
+      expect(eventService.emit).toHaveBeenCalled();
     });
     it('register updated schema with increased version', async () => {
       jest
@@ -138,9 +137,26 @@ describe('EntitySchemaRegistryService', () => {
           version: 2,
         }),
       );
-      expect(cacheManager.del).toHaveBeenCalledWith(
-        GRAPHQL_SCHEMA_VERSION_CACHE_KEY,
-      );
+      expect(eventService.emit).toHaveBeenCalled();
+    });
+    it('revert schema if exception is threw', async () => {
+      jest
+        .spyOn(repository, 'getSchemaByFingerprint')
+        .mockImplementation(() => Promise.resolve(null));
+      jest
+        .spyOn(repository, 'getLatestSchema')
+        .mockImplementation(() => Promise.resolve(entitySchema));
+      jest
+        .spyOn(repository, 'deleteSchema')
+        .mockImplementation(() => Promise.resolve());
+      jest
+        .spyOn(eventService, 'emit')
+        .mockImplementation(() => Promise.reject());
+      await expect(
+        async () =>
+          await service.register('User', userSchema as EntityJSONSchema),
+      ).rejects.toThrow(EntitySchemaRegisterFailedException);
+      expect(repository.deleteSchema).toHaveBeenCalled();
     });
   });
 });

@@ -70,8 +70,11 @@ export class EntityStoreGraphQLService {
     return !this.lastSchemaVersion || this.lastSchemaVersion !== schemaVersion;
   }
 
-  private async refreshCache() {
-    Logger.log('Generating GraphQL schema and resolvers');
+  async refreshCache() {
+    Logger.log(
+      'Generating GraphQL schema and resolvers',
+      EntityStoreGraphQLService.name,
+    );
     const entitySchemas = await this.getEntitySchemas();
     this.cachedGraphQLSchemaString =
       this.schemaGenerator.generate(entitySchemas);

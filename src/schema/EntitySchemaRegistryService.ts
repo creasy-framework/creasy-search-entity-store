@@ -1,18 +1,18 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
-import { Cache } from 'cache-manager';
+import { Injectable } from '@nestjs/common';
 import { EntitySchema } from './EntitySchema';
 import { EntitySchemaRegistryRepository } from './EntitySchemaRegistryRepository';
 import { EntitySchemaValidator } from './validators/EntitySchemaValidator';
 import { EntitySchemaNotFoundException } from './exceptions/EntitySchemaNotFoundException';
 import { EntityJSONSchema } from './Types';
-import { GRAPHQL_SCHEMA_VERSION_CACHE_KEY } from '../graphql/Constants';
+import { EventService, ENTITY_SCHEMA_UPDATE_EVENT } from '../event';
+import { EntitySchemaRegisterFailedException } from './exceptions/EntitySchemaRegisterFailedException';
 
 @Injectable()
 export class EntitySchemaRegistryService {
   constructor(
     private entitySchemaRepository: EntitySchemaRegistryRepository,
     private validator: EntitySchemaValidator,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private eventService: EventService,
   ) {}
 
   async fetch(entityType: string, version?: number): Promise<EntitySchema> {
@@ -53,8 +53,16 @@ export class EntitySchemaRegistryService {
     );
 
     this.validator.validate(entitySchema);
-    await this.entitySchemaRepository.saveSchema(entitySchema.toJson());
-    await this.cacheManager.del(GRAPHQL_SCHEMA_VERSION_CACHE_KEY);
+    try {
+      await this.entitySchemaRepository.saveSchema(entitySchema.toJson());
+      await this.eventService.emit(ENTITY_SCHEMA_UPDATE_EVENT, {
+        key: entityType,
+        value: JSON.stringify(entitySchema.toJson()),
+      });
+    } catch (e) {
+      await this.entitySchemaRepository.deleteSchema(entitySchema.toJson());
+      throw new EntitySchemaRegisterFailedException();
+    }
   }
 
   private async getLatestSchemaVersion(entityType: string) {

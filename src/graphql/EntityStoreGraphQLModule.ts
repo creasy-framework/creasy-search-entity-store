@@ -7,6 +7,8 @@ import { EntityStoreGraphQLController } from './EntityStoreGraphQLController';
 import { EntityStoreGraphQLSchemaGenerator } from './EntityStoreGraphQLSchemaGenerator';
 import { EntityStoreGraphQLResolverGenerator } from './EntityStoreGraphQLResolverGenerator';
 import { EntityStoreModule } from '../store';
+import { EventModule } from '../event';
+import { EventHandler } from './EventHandler';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -18,12 +20,14 @@ import { EntityStoreModule } from '../store';
       port: process.env.CACHE_PORT,
       ttl: Number(process.env.CACHE_TTL),
     }),
+    EventModule,
   ],
   controllers: [EntityStoreGraphQLController],
   providers: [
     EntityStoreGraphQLService,
     EntityStoreGraphQLSchemaGenerator,
     EntityStoreGraphQLResolverGenerator,
+    EventHandler,
   ],
 })
 export class EntityStoreGraphQLModule {}

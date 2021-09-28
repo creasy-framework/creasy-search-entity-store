@@ -1,6 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { KafkaService } from '@rob3000/nestjs-kafka';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { KafkaService, SUBSCRIBER_MAP } from '@rob3000/nestjs-kafka';
 import { Message } from 'kafkajs';
+import { FAILED_TO_PROCEED_EVENT } from './Constants';
 
 export interface EventMessage extends Message {
   value: any | Buffer | string | null;
@@ -8,18 +9,69 @@ export interface EventMessage extends Message {
 }
 
 @Injectable()
-export class EventService {
+export class EventService implements OnModuleInit {
+  private eventSubscriberMap = new Map();
   constructor(@Inject('ENTITY_EVENT_CLIENT') private client: KafkaService) {}
 
-  async emit(topic: string, messages: EventMessage[]): Promise<void> {
+  async onModuleInit() {
+    await this.client.connect();
+  }
+
+  async emit(event: string, message: EventMessage): Promise<void> {
     await this.client.send({
-      key: topic,
-      topic: topic,
-      messages: messages,
+      key: event,
+      topic: event,
+      messages: [message],
     } as any);
   }
 
-  subscribe(topic: string, instance: any) {
-    this.client.subscribeToResponseOf(topic, instance);
+  private dispatch =
+    (event: string) =>
+    async (
+      value: string,
+      key: string,
+      offset: string,
+      timestamp: number,
+      partition: number,
+    ) => {
+      Logger.log(
+        `Received ${event}, key= ${key}, payload=${value}`,
+        EventService.name,
+      );
+      const subscribers = this.eventSubscriberMap.get(event);
+      try {
+        const promises = [];
+        subscribers.forEach((subscriber) =>
+          promises.push(subscriber(value, key)),
+        );
+        await Promise.all(promises);
+        this.commitOffsets(event, offset, partition);
+      } catch (e) {
+        await this.emit(`${FAILED_TO_PROCEED_EVENT}${event}`, {
+          key,
+          value,
+        });
+      }
+    };
+
+  private commitOffsets(event: string, offset: string, partition: number) {
+    (this.client as any).consumer.commitOffsets([
+      {
+        topic: event,
+        partition,
+        offset: String(Number(offset) + 1),
+      },
+    ]);
+  }
+
+  subscribe(event: string, method: any) {
+    if (!this.eventSubscriberMap.has(event)) {
+      this.eventSubscriberMap.set(event, []);
+      SUBSCRIBER_MAP.set(event, this.dispatch(event));
+    }
+    this.eventSubscriberMap.set(event, [
+      ...this.eventSubscriberMap.get(event),
+      method,
+    ]);
   }
 }

@@ -1,7 +1,6 @@
-import { CacheModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
-import * as redisStore from 'cache-manager-redis-store';
 import { EntitySchemaRegistryController } from './EntitySchemaRegistryController';
 import { EntitySchemaRegistryService } from './EntitySchemaRegistryService';
 import { EntitySchemaValidator } from './validators/EntitySchemaValidator';
@@ -10,6 +9,7 @@ import {
   EntitySchemaDocument,
   EntitySchemaDocumentSchema,
 } from './EntitySchemaDocument';
+import { EventModule } from '../event';
 
 @Module({
   imports: [
@@ -23,12 +23,7 @@ import {
         schema: EntitySchemaDocumentSchema,
       },
     ]),
-    CacheModule.register({
-      store: redisStore,
-      host: process.env.CACHE_HOST,
-      port: process.env.CACHE_PORT,
-      ttl: Number(process.env.CACHE_TTL),
-    }),
+    EventModule,
   ],
   controllers: [EntitySchemaRegistryController],
   providers: [

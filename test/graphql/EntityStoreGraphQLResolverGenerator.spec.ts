@@ -1,11 +1,10 @@
 import { EntityStoreGraphQLResolverGenerator } from '../../src/graphql';
-import { EntityStoreRepository } from '../../src/store';
 import { buildASTSchema, GraphQLObjectType } from 'graphql';
 import '../gql.d.ts';
 import gql from '../__fixtures/graphql/graphql-schema.gql';
 
 describe('EntityStoreGraphQLResolverGenerator', () => {
-  let entityRepository: EntityStoreRepository;
+  let entityRepository: any;
   let generator: any;
   let graphQLSchema;
   let userType: GraphQLObjectType;
@@ -17,6 +16,8 @@ describe('EntityStoreGraphQLResolverGenerator', () => {
       fetchById: jest.fn(),
       fetchByIds: jest.fn(),
       fetchByRefId: jest.fn(),
+      insertEntity: jest.fn(),
+      updateEntity: jest.fn(),
     };
     generator = new EntityStoreGraphQLResolverGenerator(entityRepository);
     graphQLSchema = buildASTSchema(gql);

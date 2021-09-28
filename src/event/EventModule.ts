@@ -17,9 +17,18 @@ import { EventService } from './EventService';
               consumer: {
                 groupId: 'entity-event-consumer',
                 allowAutoTopicCreation: true,
+                retry: {
+                  maxRetryTime: 5,
+                },
+              },
+              consumerRunConfig: {
+                autoCommit: false,
               },
               producer: {
                 allowAutoTopicCreation: true,
+                retry: {
+                  maxRetryTime: 5,
+                },
               },
             },
           },
