@@ -3,6 +3,7 @@ import {
   Catch,
   ArgumentsHost,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import {
@@ -14,6 +15,9 @@ import {
 
 @Catch()
 export class AppExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(
+    AppExceptionFilter.name,
+  );
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -35,12 +39,10 @@ export class AppExceptionFilter implements ExceptionFilter {
         errorCode,
         ...context,
       });
+      this.logger.error(`[${status}] - ${errorCode}: ${JSON.stringify(context)}`);
     } else {
-      response.status(status).json({
-        statusCode: status,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-      });
+      response.status(status);
     }
+    this.logger.error(`${exception.message}: ${exception.stack}`);
   }
 }

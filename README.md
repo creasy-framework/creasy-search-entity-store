@@ -20,3 +20,8 @@ Run tests
 ```bash
 yarn test:watch
 ```
+
+Postman Collection
+```
+https://www.getpostman.com/collections/d5a769337c6a1141e1cf
+```

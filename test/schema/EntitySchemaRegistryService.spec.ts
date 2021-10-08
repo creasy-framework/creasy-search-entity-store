@@ -80,7 +80,7 @@ describe('EntitySchemaRegistryService', () => {
         await service.fetch('User', 2);
       } catch (e) {
         expect(e instanceof EntitySchemaNotFoundException).toBe(true);
-        expect((e as EntitySchemaNotFoundException).errorContext).toEqual({
+        expect((e as EntitySchemaNotFoundException).getContext()).toEqual({
           entityType: 'User',
           version: 2,
         });

@@ -1,10 +1,9 @@
-import { Logger } from '@nestjs/common';
 import { EntitySchema } from '../EntitySchema';
 import { InvalidSchemaException } from '../exceptions/InvalidSchemaException';
 import {
   ERROR_INVALID_SCHEMA_MISSING_PROPERTIES,
   ERROR_INVALID_SCHEMA_INVALID_PROPERTY_TYPE,
-  ERROR_INVALID_SCHEMA_INVALID_PROPERTY_NAME,
+  ERROR_INVALID_SCHEMA_INVALID_PROPERTY_NAME, ERROR_INVALID_SCHEMA_MISSING_ENTITY_ID_FIELD,
 } from '../Constants';
 import {
   EntitySchemaValidationInterceptor,
@@ -14,19 +13,19 @@ import {
 export class EntityPropertyValidationInterceptor
   implements EntitySchemaValidationInterceptor
 {
-  private readonly logger = new Logger(
-    EntityPropertyValidationInterceptor.name,
-  );
   validate(schema: EntitySchema): void {
     const entitySchema = schema.getEntitySchema();
     const { properties } = entitySchema;
-    if (!properties || typeof properties !== 'object') {
-      this.logger.error(
-        `"properties" is missing in ${schema.getEntityType()} schema`,
-      );
+    if (!properties || typeof properties !== 'object' || properties instanceof Array) {
       throw new InvalidSchemaException(
         ERROR_INVALID_SCHEMA_MISSING_PROPERTIES,
         {},
+      );
+    }
+    if (!properties[schema.getIdField()]) {
+      throw new InvalidSchemaException(
+        ERROR_INVALID_SCHEMA_MISSING_ENTITY_ID_FIELD,
+        { propertyName: schema.getIdField() },
       );
     }
     Object.entries(properties).forEach(([name, property]) => {
@@ -36,7 +35,6 @@ export class EntityPropertyValidationInterceptor
           propertyType,
         )
       ) {
-        this.logger.error(`property type "${propertyType}" is invalid`);
         throw new InvalidSchemaException(
           ERROR_INVALID_SCHEMA_INVALID_PROPERTY_TYPE,
           { propertyType, propertyName: name },

@@ -5,7 +5,7 @@ import { InvalidSchemaException } from '../../../src/schema/exceptions/InvalidSc
 import {
   ERROR_INVALID_SCHEMA_INVALID_PROPERTY_TYPE,
   ERROR_INVALID_SCHEMA_MISSING_PROPERTIES,
-  ERROR_INVALID_SCHEMA_INVALID_PROPERTY_NAME,
+  ERROR_INVALID_SCHEMA_INVALID_PROPERTY_NAME, ERROR_INVALID_SCHEMA_MISSING_ENTITY_ID_FIELD,
 } from '../../../src/schema/Constants';
 
 describe('EntitySchemaValidationInterceptor', () => {
@@ -33,12 +33,12 @@ describe('EntitySchemaValidationInterceptor', () => {
       validator.validate(entitySchema);
     } catch (e) {
       expect(e instanceof InvalidSchemaException).toBe(true);
-      expect((e as InvalidSchemaException).errorCode).toBe(
+      expect((e as InvalidSchemaException).getErrorCode()).toBe(
         ERROR_INVALID_SCHEMA_MISSING_PROPERTIES,
       );
     }
   });
-  it('should throw InvalidSchemaException exception if one of property type is invalid', () => {
+  it('should throw InvalidSchemaException exception if missing entity id field', () => {
     const entitySchema = EntitySchema.fromJson({
       entityType: 'User',
       entitySchema: { properties: { foo: { type: 'object' } } } as any,
@@ -50,10 +50,30 @@ describe('EntitySchemaValidationInterceptor', () => {
       validator.validate(entitySchema);
     } catch (e) {
       expect(e instanceof InvalidSchemaException).toBe(true);
-      expect((e as InvalidSchemaException).errorCode).toBe(
+      expect((e as InvalidSchemaException).getErrorCode()).toBe(
+        ERROR_INVALID_SCHEMA_MISSING_ENTITY_ID_FIELD,
+      );
+      expect((e as InvalidSchemaException).getContext()).toEqual({
+        propertyName: 'userId',
+      });
+    }
+  });
+  it('should throw InvalidSchemaException exception if one of property type is invalid', () => {
+    const entitySchema = EntitySchema.fromJson({
+      entityType: 'User',
+      entitySchema: { properties: { userId: { type: 'string' }, foo: { type: 'object' } } } as any,
+      version: 1,
+      fingerprint: 'fingerprint',
+      createdAt: Date.now(),
+    });
+    try {
+      validator.validate(entitySchema);
+    } catch (e) {
+      expect(e instanceof InvalidSchemaException).toBe(true);
+      expect((e as InvalidSchemaException).getErrorCode()).toBe(
         ERROR_INVALID_SCHEMA_INVALID_PROPERTY_TYPE,
       );
-      expect((e as InvalidSchemaException).errorContext).toEqual({
+      expect((e as InvalidSchemaException).getContext()).toEqual({
         propertyName: 'foo',
         propertyType: 'object',
       });
@@ -63,7 +83,7 @@ describe('EntitySchemaValidationInterceptor', () => {
     const entitySchema = EntitySchema.fromJson({
       entityType: 'User',
       entitySchema: {
-        properties: { org: { type: 'string', refType: 'Organization' } },
+        properties: { userId: { type: 'string' }, org: { type: 'string', refType: 'Organization' } },
       } as any,
       version: 1,
       fingerprint: 'fingerprint',
@@ -73,10 +93,10 @@ describe('EntitySchemaValidationInterceptor', () => {
       validator.validate(entitySchema);
     } catch (e) {
       expect(e instanceof InvalidSchemaException).toBe(true);
-      expect((e as InvalidSchemaException).errorCode).toBe(
+      expect((e as InvalidSchemaException).getErrorCode()).toBe(
         ERROR_INVALID_SCHEMA_INVALID_PROPERTY_NAME,
       );
-      expect((e as InvalidSchemaException).errorContext).toEqual({
+      expect((e as InvalidSchemaException).getContext()).toEqual({
         propertyName: 'org',
         propertyType: 'string',
       });
@@ -87,6 +107,7 @@ describe('EntitySchemaValidationInterceptor', () => {
       entityType: 'User',
       entitySchema: {
         properties: {
+          userId: { type: 'string' },
           org: {
             type: 'array',
             items: { type: 'string', refType: 'Organization' },
@@ -101,10 +122,10 @@ describe('EntitySchemaValidationInterceptor', () => {
       validator.validate(entitySchema);
     } catch (e) {
       expect(e instanceof InvalidSchemaException).toBe(true);
-      expect((e as InvalidSchemaException).errorCode).toBe(
+      expect((e as InvalidSchemaException).getErrorCode()).toBe(
         ERROR_INVALID_SCHEMA_INVALID_PROPERTY_NAME,
       );
-      expect((e as InvalidSchemaException).errorContext).toEqual({
+      expect((e as InvalidSchemaException).getContext()).toEqual({
         propertyName: 'org',
         propertyType: 'string',
       });
