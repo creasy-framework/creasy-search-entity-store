@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { EntityStoreRepository } from './EntityStoreRepository';
+import { ENTITY_PUBLISHED_EVENT, EventService } from "../event";
 
 @Injectable()
 export class EntityStoreService {
-  constructor(private repository: EntityStoreRepository) {}
+  constructor(private readonly repository: EntityStoreRepository, private readonly eventService: EventService) {}
 
   async saveEntity(entity: any, entityType: string) {
     const { entitySchema } = await this.repository.getModelMeta(entityType);
@@ -15,6 +16,7 @@ export class EntityStoreService {
     } else {
       await this.repository.insertEntity(entityType, entity);
     }
+    await this.eventService.emit(ENTITY_PUBLISHED_EVENT, { key: entityType, value: entityId });
   }
 
   async refreshStore(entityType: string) {
