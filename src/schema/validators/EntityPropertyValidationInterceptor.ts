@@ -3,7 +3,8 @@ import { InvalidSchemaException } from '../exceptions/InvalidSchemaException';
 import {
   ERROR_INVALID_SCHEMA_MISSING_PROPERTIES,
   ERROR_INVALID_SCHEMA_INVALID_PROPERTY_TYPE,
-  ERROR_INVALID_SCHEMA_INVALID_PROPERTY_NAME, ERROR_INVALID_SCHEMA_MISSING_ENTITY_ID_FIELD,
+  ERROR_INVALID_SCHEMA_INVALID_PROPERTY_NAME,
+  ERROR_INVALID_SCHEMA_MISSING_ENTITY_ID_FIELD,
 } from '../Constants';
 import {
   EntitySchemaValidationInterceptor,
@@ -16,7 +17,11 @@ export class EntityPropertyValidationInterceptor
   validate(schema: EntitySchema): void {
     const entitySchema = schema.getEntitySchema();
     const { properties } = entitySchema;
-    if (!properties || typeof properties !== 'object' || properties instanceof Array) {
+    if (
+      !properties ||
+      typeof properties !== 'object' ||
+      properties instanceof Array
+    ) {
       throw new InvalidSchemaException(
         ERROR_INVALID_SCHEMA_MISSING_PROPERTIES,
         {},

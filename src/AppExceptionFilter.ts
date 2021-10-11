@@ -15,9 +15,7 @@ import {
 
 @Catch()
 export class AppExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger(
-    AppExceptionFilter.name,
-  );
+  private readonly logger = new Logger(AppExceptionFilter.name);
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -39,7 +37,9 @@ export class AppExceptionFilter implements ExceptionFilter {
         errorCode,
         ...context,
       });
-      this.logger.error(`[${status}] - ${errorCode}: ${JSON.stringify(context)}`);
+      this.logger.error(
+        `[${status}] - ${errorCode}: ${JSON.stringify(context)}`,
+      );
     } else {
       response.status(status);
     }

@@ -79,7 +79,10 @@ export class EntitySchema {
   getIdField(): string {
     return (
       this.entitySchema.idField ||
-      `${this.getEntityType().charAt(0).toLowerCase() + this.getEntityType().slice(1)}Id`
+      `${
+        this.getEntityType().charAt(0).toLowerCase() +
+        this.getEntityType().slice(1)
+      }Id`
     );
   }
 

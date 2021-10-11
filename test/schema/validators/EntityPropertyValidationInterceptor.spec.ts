@@ -5,7 +5,8 @@ import { InvalidSchemaException } from '../../../src/schema/exceptions/InvalidSc
 import {
   ERROR_INVALID_SCHEMA_INVALID_PROPERTY_TYPE,
   ERROR_INVALID_SCHEMA_MISSING_PROPERTIES,
-  ERROR_INVALID_SCHEMA_INVALID_PROPERTY_NAME, ERROR_INVALID_SCHEMA_MISSING_ENTITY_ID_FIELD,
+  ERROR_INVALID_SCHEMA_INVALID_PROPERTY_NAME,
+  ERROR_INVALID_SCHEMA_MISSING_ENTITY_ID_FIELD,
 } from '../../../src/schema/Constants';
 
 describe('EntitySchemaValidationInterceptor', () => {
@@ -61,7 +62,9 @@ describe('EntitySchemaValidationInterceptor', () => {
   it('should throw InvalidSchemaException exception if one of property type is invalid', () => {
     const entitySchema = EntitySchema.fromJson({
       entityType: 'User',
-      entitySchema: { properties: { userId: { type: 'string' }, foo: { type: 'object' } } } as any,
+      entitySchema: {
+        properties: { userId: { type: 'string' }, foo: { type: 'object' } },
+      } as any,
       version: 1,
       fingerprint: 'fingerprint',
       createdAt: Date.now(),
@@ -83,7 +86,10 @@ describe('EntitySchemaValidationInterceptor', () => {
     const entitySchema = EntitySchema.fromJson({
       entityType: 'User',
       entitySchema: {
-        properties: { userId: { type: 'string' }, org: { type: 'string', refType: 'Organization' } },
+        properties: {
+          userId: { type: 'string' },
+          org: { type: 'string', refType: 'Organization' },
+        },
       } as any,
       version: 1,
       fingerprint: 'fingerprint',
