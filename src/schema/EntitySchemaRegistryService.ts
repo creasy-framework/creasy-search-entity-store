@@ -6,6 +6,7 @@ import { EntitySchemaNotFoundException } from './exceptions/EntitySchemaNotFound
 import { EntityJSONSchema } from './Types';
 import { EventService, ENTITY_SCHEMA_UPDATE_EVENT } from '../event';
 import { EntitySchemaRegisterFailedException } from './exceptions/EntitySchemaRegisterFailedException';
+import { EntitySchemaDocument } from './EntitySchemaDocument';
 
 @Injectable()
 export class EntitySchemaRegistryService {
@@ -14,6 +15,12 @@ export class EntitySchemaRegistryService {
     private validator: EntitySchemaValidator,
     private eventService: EventService,
   ) {}
+
+  async fetchAllLatest(): Promise<EntitySchema[]> {
+    const schemas: EntitySchemaDocument[] =
+      await this.entitySchemaRepository.getLatestSchemas();
+    return schemas.map((scheme) => EntitySchema.fromJson(scheme));
+  }
 
   async fetch(entityType: string, version?: number): Promise<EntitySchema> {
     let entitySchema;

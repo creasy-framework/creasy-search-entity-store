@@ -1,7 +1,7 @@
 import { EntityStoreService } from '../../src/store/EntityStoreService';
 import userSchema from '../__fixtures/entity-schemas/user-schema.json';
 import { EntityJSONSchema, EntitySchema } from '../../src/schema';
-import { ENTITY_PUBLISHED_EVENT_SUFFIX } from '../../src/event';
+import { ENTITY_PUBLISHED_EVENT } from '../../src/event';
 
 describe('EntityStoreService', () => {
   let entityStoreService;
@@ -48,10 +48,10 @@ describe('EntityStoreService', () => {
         'User',
         entity,
       );
-      expect(eventService.emit).toHaveBeenCalledWith(
-        `User${ENTITY_PUBLISHED_EVENT_SUFFIX}`,
-        { key: 'User', value: '1' },
-      );
+      expect(eventService.emit).toHaveBeenCalledWith(ENTITY_PUBLISHED_EVENT, {
+        key: 'User',
+        value: '{"entityType":"User","id":"1"}',
+      });
     });
 
     it('saveEntity should call updateEntity if any entity found', async () => {
@@ -62,10 +62,10 @@ describe('EntityStoreService', () => {
         '1',
         entity,
       );
-      expect(eventService.emit).toHaveBeenCalledWith(
-        `User${ENTITY_PUBLISHED_EVENT_SUFFIX}`,
-        { key: 'User', value: '1' },
-      );
+      expect(eventService.emit).toHaveBeenCalledWith(ENTITY_PUBLISHED_EVENT, {
+        key: 'User',
+        value: '{"entityType":"User","id":"1"}',
+      });
     });
 
     it('saveEntity should not call updateEntity and insertEntity if entity id is invalid', async () => {

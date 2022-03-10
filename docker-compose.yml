@@ -36,3 +36,13 @@ services:
     image: redis
     ports:
       - "6379:6379"
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    environment:
+      JVM_OPTS: "-Xms32M -Xmx64M"
+      SERVER_SERVLET_CONTEXTPATH: "/"
+      KAFKA_BROKERCONNECT: "kafka:9093"
+    ports:
+      - "9000:9000"
+    links:
+      - kafka

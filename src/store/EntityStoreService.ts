@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { EntityStoreRepository } from './EntityStoreRepository';
-import { ENTITY_PUBLISHED_EVENT_SUFFIX, EventService } from '../event';
+import { ENTITY_PUBLISHED_EVENT, EventService } from '../event';
 
 @Injectable()
 export class EntityStoreService {
@@ -19,10 +19,10 @@ export class EntityStoreService {
     } else {
       await this.repository.insertEntity(entityType, entity);
     }
-    await this.eventService.emit(
-      `${entityType}${ENTITY_PUBLISHED_EVENT_SUFFIX}`,
-      { key: entityType, value: entityId },
-    );
+    await this.eventService.emit(ENTITY_PUBLISHED_EVENT, {
+      key: entityType,
+      value: JSON.stringify({ entityType, id: entityId }),
+    });
   }
 
   async refreshStore(entityType: string) {

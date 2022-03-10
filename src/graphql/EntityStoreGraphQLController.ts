@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Res } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { EntityStoreGraphQLService } from './EntityStoreGraphQLService';
 import { PlainBody } from './PlainBodyDecorator';
@@ -12,7 +12,7 @@ export class EntityStoreGraphQLController {
     @Res() response: Response,
   ): Promise<void> {
     const result = await this.service.execute(query);
-    response.json(result);
+    response.status(HttpStatus.OK).json(result);
   }
 
   @Get('schema')

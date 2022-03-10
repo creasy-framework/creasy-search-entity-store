@@ -11,6 +11,7 @@ import {
 import { Response } from 'express';
 import { EntitySchemaRegistryService } from './EntitySchemaRegistryService';
 import { EntityJSONSchema } from './Types';
+import { EntitySchema } from './EntitySchema';
 
 @Controller('entity-schema-registry')
 export class EntitySchemaRegistryController {
@@ -23,6 +24,14 @@ export class EntitySchemaRegistryController {
   ): Promise<void> {
     const entitySchema = await this.service.fetch(entityType, version);
     response.status(HttpStatus.OK).json(entitySchema.toJson());
+  }
+
+  @Get()
+  async list(@Res() response: Response): Promise<void> {
+    const entitySchemas: EntitySchema[] = await this.service.fetchAllLatest();
+    response
+      .status(HttpStatus.OK)
+      .json(entitySchemas.map((schema) => schema.toJson()));
   }
 
   @Post(':type')
