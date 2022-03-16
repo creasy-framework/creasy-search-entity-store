@@ -33,6 +33,7 @@
     "apollo-server-express": "^3.3.0",
     "cache-manager": "^3.4.4",
     "cache-manager-redis-store": "^2.0.0",
+    "camelcase": "^6.3.0",
     "graphql": "^15.5.2",
     "kafkajs": "^1.15.0",
     "mongodb-memory-server": "^7.3.6",

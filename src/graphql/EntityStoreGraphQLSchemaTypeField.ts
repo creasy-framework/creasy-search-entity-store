@@ -1,3 +1,4 @@
+import camelCase from 'camelcase';
 import { EntityJSONSchemaPrimitiveType, EntitySchemaField } from '../schema';
 import { DEPENDENT_FIELD_SEPARATOR } from './Constants';
 
@@ -22,9 +23,9 @@ export class EntityStoreGraphQLSchemaQueryField extends EntityStoreGraphQLSchema
     const argumentType = this.mapPrimitiveType(
       this.entitySchemaField.getType(),
     );
-    return `${
-      this.entityType.charAt(0).toLowerCase() + this.entityType.slice(1)
-    }(${argumentName}: ${argumentType}): ${this.entityType}`;
+    return `${camelCase(this.entityType)}(${argumentName}: ${argumentType}): ${
+      this.entityType
+    }`;
   }
 }
 

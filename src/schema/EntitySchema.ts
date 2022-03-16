@@ -1,3 +1,4 @@
+import camelCase from 'camelcase';
 import { EntitySchemaField } from './EntitySchemaField';
 import { EntityJSONSchema, EntityJSONSchemaField } from './Types';
 import { EntitySchemaDocument } from './EntitySchemaDocument';
@@ -77,13 +78,7 @@ export class EntitySchema {
   }
 
   getIdField(): string {
-    return (
-      this.entitySchema.idField ||
-      `${
-        this.getEntityType().charAt(0).toLowerCase() +
-        this.getEntityType().slice(1)
-      }Id`
-    );
+    return this.entitySchema.idField || `${camelCase(this.getEntityType())}Id`;
   }
 
   toJson() {
