@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@eropple/nestjs-correlation-id": "^1.0.1",
     "@nestjs/common": "^8.0.6",
     "@nestjs/config": "^1.0.1",
     "@nestjs/core": "^8.0.6",
@@ -38,6 +39,8 @@
     "kafkajs": "^1.15.0",
     "mongodb-memory-server": "^7.3.6",
     "mongoose": "^6.0.2",
+    "nestjs-pino": "^2.5.1",
+    "pino-http": "^6.6.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0"

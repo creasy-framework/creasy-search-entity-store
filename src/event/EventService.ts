@@ -1,27 +1,41 @@
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { KafkaService, SUBSCRIBER_MAP } from '@rob3000/nestjs-kafka';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
 import { Message } from 'kafkajs';
 import { FAILED_TO_PROCEED_EVENT } from './Constants';
 
 export interface EventMessage extends Message {
   value: any | Buffer | string | null;
   key?: any;
+  correlationId?: string;
 }
 
 @Injectable()
 export class EventService implements OnModuleInit {
   private eventSubscriberMap = new Map();
-  constructor(@Inject('ENTITY_EVENT_CLIENT') private client: KafkaService) {}
+  constructor(
+    @Inject('ENTITY_EVENT_CLIENT') private client: KafkaService,
+    @Inject(REQUEST) private readonly request: Request,
+  ) {}
 
   async onModuleInit() {
     await this.client.connect();
   }
 
   async emit(event: string, message: EventMessage): Promise<void> {
+    const fallbackCorrelationId = this.request.headers['x-correlation-id'];
+    const { correlationId = fallbackCorrelationId, ...otherParts } = message;
+    Logger.log(`Emitting ${event}`, EventService.name);
     await this.client.send({
       key: event,
       topic: event,
-      messages: [message],
+      messages: [
+        {
+          ...otherParts,
+          correlationId,
+        },
+      ],
     } as any);
   }
 
