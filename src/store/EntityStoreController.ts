@@ -5,9 +5,10 @@ import {
   Param,
   Post,
   Query,
+  Req,
   Res,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { EntityStoreService } from './EntityStoreService';
 import { ENTITY_UPDATE_EVENT, EventService } from '../event';
 
@@ -25,14 +26,23 @@ export class EntityStoreController {
     @Body()
     entity: any,
     @Res() response: Response,
+    @Req() request: Request,
   ): Promise<void> {
+    const correlationId: string = request.headers['x-correlation-id'] as string;
     if (async) {
       await this.eventService.emit(ENTITY_UPDATE_EVENT, {
         key: entityType,
-        value: JSON.stringify(entity),
+        value: JSON.stringify({
+          correlationId,
+          data: entity,
+        }),
       });
     } else {
-      await this.entityStoreService.saveEntity(entity, entityType);
+      await this.entityStoreService.saveEntity(
+        entity,
+        entityType,
+        correlationId,
+      );
     }
     response.status(HttpStatus.ACCEPTED).send();
   }

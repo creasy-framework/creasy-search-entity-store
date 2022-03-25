@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EntityStoreService } from './EntityStoreService';
 import {
   ENTITY_SCHEMA_UPDATE_EVENT,
@@ -22,11 +22,12 @@ export class EventHandler {
     );
   }
 
-  async onEntityUpdate(entity: string, entityType: string) {
-    await this.entityStoreService.saveEntity(JSON.parse(entity), entityType);
+  async onEntityUpdate(event: string, entityType: string) {
+    const { correlationId, data } = JSON.parse(event);
+    await this.entityStoreService.saveEntity(data, entityType, correlationId);
   }
 
-  async onEntitySchemaUpdate(schema: string, entityType: string) {
+  async onEntitySchemaUpdate(event: string, entityType: string) {
     await this.entityStoreService.refreshStore(entityType);
   }
 }

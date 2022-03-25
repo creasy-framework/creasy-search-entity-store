@@ -6,9 +6,10 @@ import {
   Param,
   Post,
   Query,
+  Req,
   Res,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { EntitySchemaRegistryService } from './EntitySchemaRegistryService';
 import { EntityJSONSchema } from './Types';
 import { EntitySchema } from './EntitySchema';
@@ -39,8 +40,10 @@ export class EntitySchemaRegistryController {
     @Param('type') entityType: string,
     @Body() entitySchema: EntityJSONSchema,
     @Res() response: Response,
+    @Req() request: Request,
   ): Promise<void> {
-    await this.service.register(entityType, entitySchema);
+    const correlationId: string = request.headers['x-correlation-id'] as string;
+    await this.service.register(entityType, entitySchema, correlationId);
     response.status(HttpStatus.CREATED).send();
   }
 }

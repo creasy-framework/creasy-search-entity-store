@@ -49,6 +49,7 @@ export class EventService implements OnModuleInit {
         await Promise.all(promises);
         this.commitOffsets(event, offset, partition);
       } catch (e) {
+        Logger.error(`Failed to handle message ${value}`, EventService.name);
         await this.emit(`${FAILED_TO_PROCEED_EVENT}${event}`, {
           key,
           value,

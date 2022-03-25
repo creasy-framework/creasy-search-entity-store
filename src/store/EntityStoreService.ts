@@ -9,7 +9,7 @@ export class EntityStoreService {
     private readonly eventService: EventService,
   ) {}
 
-  async saveEntity(entity: any, entityType: string) {
+  async saveEntity(entity: any, entityType: string, correlationId: string) {
     const { entitySchema } = await this.repository.getModelMeta(entityType);
     const entityId = entity[entitySchema.getIdField()];
     if (!entityId) return null;
@@ -21,7 +21,10 @@ export class EntityStoreService {
     }
     await this.eventService.emit(ENTITY_PUBLISHED_EVENT, {
       key: entityType,
-      value: JSON.stringify({ entityType, id: entityId }),
+      value: JSON.stringify({
+        correlationId,
+        data: { entityType, id: entityId },
+      }),
     });
   }
 

@@ -40,7 +40,11 @@ export class EntitySchemaRegistryService {
     return EntitySchema.fromJson(entitySchema);
   }
 
-  async register(entityType: string, schema: EntityJSONSchema): Promise<void> {
+  async register(
+    entityType: string,
+    schema: EntityJSONSchema,
+    correlationId: string,
+  ): Promise<void> {
     const fingerprint = EntitySchema.generateFingerprint(schema);
     const existingSchema =
       await this.entitySchemaRepository.getSchemaByFingerprint(fingerprint);
@@ -64,7 +68,10 @@ export class EntitySchemaRegistryService {
       await this.entitySchemaRepository.saveSchema(entitySchema.toJson());
       await this.eventService.emit(ENTITY_SCHEMA_UPDATE_EVENT, {
         key: entityType,
-        value: JSON.stringify(entitySchema.toJson()),
+        value: JSON.stringify({
+          correlationId,
+          data: entitySchema.toJson(),
+        }),
       });
     } catch (e) {
       await this.entitySchemaRepository.deleteSchema(entitySchema.toJson());
