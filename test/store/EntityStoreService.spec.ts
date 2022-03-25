@@ -50,7 +50,7 @@ describe('EntityStoreService', () => {
       );
       expect(eventService.emit).toHaveBeenCalledWith(ENTITY_PUBLISHED_EVENT, {
         key: 'User',
-        value: '{"entityType":"User","id":"1"}',
+        value: '{"data":{"entityType":"User","id":"1"}}',
       });
     });
 
@@ -64,7 +64,7 @@ describe('EntityStoreService', () => {
       );
       expect(eventService.emit).toHaveBeenCalledWith(ENTITY_PUBLISHED_EVENT, {
         key: 'User',
-        value: '{"entityType":"User","id":"1"}',
+        value: '{"data":{"entityType":"User","id":"1"}}',
       });
     });
 

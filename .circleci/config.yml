@@ -18,10 +18,3 @@ workflows:
   test_and_deploy:
     jobs:
       - test
-      - hold:
-          filters:
-            branches:
-              only: master
-          type: approval
-          requires:
-            - test

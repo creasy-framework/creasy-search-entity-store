@@ -101,7 +101,7 @@ describe('EntitySchemaRegistryService', () => {
         .spyOn(repository, 'getSchemaByFingerprint')
         .mockImplementation(() => Promise.resolve(entitySchema));
       jest.spyOn(repository, 'saveSchema');
-      await service.register('User', entitySchema as EntityJSONSchema);
+      await service.register('User', entitySchema as EntityJSONSchema, 'foo');
       expect(repository.saveSchema).not.toHaveBeenCalled();
       expect(eventService.emit).not.toHaveBeenCalled();
     });
@@ -112,7 +112,7 @@ describe('EntitySchemaRegistryService', () => {
       jest
         .spyOn(repository, 'getLatestSchema')
         .mockImplementation(() => Promise.resolve(null));
-      await service.register('User', userSchema as EntityJSONSchema);
+      await service.register('User', userSchema as EntityJSONSchema, 'foo');
       expect(repository.saveSchema).toHaveBeenCalledWith(
         expect.objectContaining({
           entityType: 'User',
@@ -129,7 +129,7 @@ describe('EntitySchemaRegistryService', () => {
       jest
         .spyOn(repository, 'getLatestSchema')
         .mockImplementation(() => Promise.resolve(entitySchema));
-      await service.register('User', userSchema as EntityJSONSchema);
+      await service.register('User', userSchema as EntityJSONSchema, 'foo');
       expect(repository.saveSchema).toHaveBeenCalledWith(
         expect.objectContaining({
           entityType: 'User',
@@ -154,7 +154,7 @@ describe('EntitySchemaRegistryService', () => {
         .mockImplementation(() => Promise.reject());
       await expect(
         async () =>
-          await service.register('User', userSchema as EntityJSONSchema),
+          await service.register('User', userSchema as EntityJSONSchema, 'foo'),
       ).rejects.toThrow(EntitySchemaRegisterFailedException);
       expect(repository.deleteSchema).toHaveBeenCalled();
     });
