@@ -14,7 +14,7 @@ describe('EntitySchemaMapper', () => {
   });
   it('should map correct field type', () => {
     const docSchema = mapper.map(entitySchema);
-    expect(docSchema.obj.userId.type).toEqual(Schema.Types.String);
+    expect(docSchema.obj.id.type).toEqual(Schema.Types.String);
     expect(docSchema.obj.reportToUserId.type).toEqual(Schema.Types.String);
     expect(docSchema.obj.organizationIds.type).toEqual([Schema.Types.String]);
   });

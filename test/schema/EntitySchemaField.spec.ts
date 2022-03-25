@@ -10,7 +10,7 @@ describe('EntitySchemaField', () => {
     );
   };
   describe('primitive field', () => {
-    const fieldName = 'userId';
+    const fieldName = 'id';
     const primitiveField = createTypeByFieldName(fieldName);
     it('isArrayField returns false', () => {
       expect(primitiveField.isArrayField()).toBe(false);

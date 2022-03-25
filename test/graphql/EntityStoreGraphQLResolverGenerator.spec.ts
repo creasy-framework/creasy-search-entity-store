@@ -35,7 +35,7 @@ describe('EntityStoreGraphQLResolverGenerator', () => {
       expect(generator.getActualType(organization)).toBe('Organization');
     });
     it('should return correct type for normal field', () => {
-      const userId = userType.getFields()['userId'];
+      const userId = userType.getFields()['id'];
       expect(generator.getActualType(userId)).toBe('String');
     });
   });
@@ -75,7 +75,7 @@ describe('EntityStoreGraphQLResolverGenerator', () => {
       expect(entityRepository.fetchById).not.toHaveBeenCalled();
       expect(actual).toBe(null);
     });
-    it('should return null if the entity is not found', async () => {
+    it('should return default entity if the entity is not found', async () => {
       entityRepository.fetchById = jest
         .fn()
         .mockImplementation(() => Promise.resolve(null));
@@ -83,11 +83,11 @@ describe('EntityStoreGraphQLResolverGenerator', () => {
         supervisorId: '1',
       });
       expect(entityRepository.fetchById).toHaveBeenCalledWith('User', '1');
-      expect(actual).toBe(null);
+      expect(actual).toEqual({ id: '1' });
     });
     it('should return properties and nested resolvers if entity is found', async () => {
       const fakeSupervisorEntity = {
-        userId: '1',
+        id: '1',
         displayName: 'Fake user',
         titles: ['fake'],
         organizationIds: ['1', '2'],
@@ -131,7 +131,7 @@ describe('EntityStoreGraphQLResolverGenerator', () => {
       expect(entityRepository.fetchByIds).not.toHaveBeenCalled();
       expect(actual).toBe(null);
     });
-    it('should return null if the entities is empty', async () => {
+    it('should return default dependent entities if the entities is empty', async () => {
       entityRepository.fetchByIds = jest
         .fn()
         .mockImplementation(() => Promise.resolve([]));
@@ -142,11 +142,14 @@ describe('EntityStoreGraphQLResolverGenerator', () => {
         '1',
         '2',
       ]);
-      expect(actual).toBe(null);
+      expect(actual).toEqual([
+        expect.objectContaining({ id: '1' }),
+        expect.objectContaining({ id: '2' }),
+      ]);
     });
     it('should call createResolverForEntityList is entities are found', async () => {
       const fakeUserEntity = {
-        userId: '1',
+        id: '1',
         displayName: 'Fake user',
         titles: ['fake'],
         organizationIds: ['1', '2'],
@@ -154,11 +157,11 @@ describe('EntityStoreGraphQLResolverGenerator', () => {
       };
       const fakeOrganizations = [
         {
-          organizationId: '1',
+          id: '1',
           displayName: 'Fake org 1',
         },
         {
-          organizationId: '2',
+          id: '2',
           displayName: 'Fake org 2',
         },
       ];
@@ -182,12 +185,12 @@ describe('EntityStoreGraphQLResolverGenerator', () => {
     let field;
     const fakeOrganizations = [
       {
-        organizationId: '1',
+        id: '1',
         displayName: 'Fake org 1',
         groupId: '1',
       },
       {
-        organizationId: '2',
+        id: '2',
         displayName: 'Fake org 2',
         groupId: '2',
       },
@@ -259,11 +262,11 @@ describe('EntityStoreGraphQLResolverGenerator', () => {
     let dependentField;
     const fakeUserEntities = [
       {
-        userId: '1',
+        id: '1',
         displayName: 'Fake user 1',
       },
       {
-        userId: '2',
+        id: '2',
         displayName: 'Fake user 2',
       },
     ];
@@ -298,7 +301,7 @@ describe('EntityStoreGraphQLResolverGenerator', () => {
   describe('createResolverForType', () => {
     let resolver;
     const fakeUserEntity = {
-      userId: '1',
+      id: '1',
       displayName: 'Fake user',
       titles: ['fake'],
       organizationIds: ['1', '2'],
@@ -319,7 +322,7 @@ describe('EntityStoreGraphQLResolverGenerator', () => {
       entityRepository.fetchById = jest
         .fn()
         .mockImplementation(() => Promise.resolve(null));
-      const actual = await resolver({ userId: '1' });
+      const actual = await resolver({ id: '1' });
       expect(entityRepository.fetchById).toHaveBeenCalledWith('User', '1');
       expect(actual).toBe(null);
     });
@@ -328,7 +331,7 @@ describe('EntityStoreGraphQLResolverGenerator', () => {
       entityRepository.fetchById = jest
         .fn()
         .mockImplementation(() => Promise.resolve(fakeUserEntity));
-      const actual = await resolver({ userId: '1' });
+      const actual = await resolver({ id: '1' });
       expect(entityRepository.fetchById).toHaveBeenCalledWith('User', '1');
       expect(actual).toMatchObject(fakeUserEntity);
       expect(typeof actual['organization']).toBe('function');

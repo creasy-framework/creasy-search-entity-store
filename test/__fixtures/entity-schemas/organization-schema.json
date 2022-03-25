@@ -2,7 +2,7 @@
   "title": "Organization",
   "type": "object",
   "properties": {
-    "organizationId": {
+    "id": {
       "type": "string"
     },
     "displayName": {

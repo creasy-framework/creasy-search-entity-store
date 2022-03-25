@@ -43,6 +43,7 @@ export class AppExceptionFilter implements ExceptionFilter {
     } else {
       response.status(status);
     }
+    response.end();
     this.logger.error(`${exception.message}: ${exception.stack}`);
   }
 }

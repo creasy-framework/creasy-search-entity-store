@@ -55,7 +55,7 @@ describe('EntitySchemaValidationInterceptor', () => {
         ERROR_INVALID_SCHEMA_MISSING_ENTITY_ID_FIELD,
       );
       expect((e as InvalidSchemaException).getContext()).toEqual({
-        propertyName: 'userId',
+        propertyName: 'id',
       });
     }
   });
@@ -63,7 +63,7 @@ describe('EntitySchemaValidationInterceptor', () => {
     const entitySchema = EntitySchema.fromJson({
       entityType: 'User',
       entitySchema: {
-        properties: { userId: { type: 'string' }, foo: { type: 'object' } },
+        properties: { id: { type: 'string' }, foo: { type: 'object' } },
       } as any,
       version: 1,
       fingerprint: 'fingerprint',
@@ -87,7 +87,7 @@ describe('EntitySchemaValidationInterceptor', () => {
       entityType: 'User',
       entitySchema: {
         properties: {
-          userId: { type: 'string' },
+          id: { type: 'string' },
           org: { type: 'string', refType: 'Organization' },
         },
       } as any,
@@ -113,7 +113,7 @@ describe('EntitySchemaValidationInterceptor', () => {
       entityType: 'User',
       entitySchema: {
         properties: {
-          userId: { type: 'string' },
+          id: { type: 'string' },
           org: {
             type: 'array',
             items: { type: 'string', refType: 'Organization' },

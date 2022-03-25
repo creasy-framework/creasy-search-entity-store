@@ -22,7 +22,14 @@ export class EntityStoreGraphQLResolverGenerator {
       this.getActualType(refField),
       ids,
     );
-    return this.createResolverForEntityList(refField, entityTypes, entities);
+    const entitiesWithDefaults = ids.map((id) => {
+      return entities.find((entity) => entity.id === id) || { id };
+    });
+    return this.createResolverForEntityList(
+      refField,
+      entityTypes,
+      entitiesWithDefaults,
+    );
   }
 
   private async resolveEntity(
@@ -40,7 +47,10 @@ export class EntityStoreGraphQLResolverGenerator {
       this.getActualType(refField),
       id,
     );
-    if (!entity) return null;
+    if (!entity)
+      return {
+        id,
+      };
     const nestedResolvers = refs.reduce((next, ref) => {
       return {
         ...next,
@@ -143,7 +153,7 @@ export class EntityStoreGraphQLResolverGenerator {
     entityTypes: GraphQLObjectType[],
   ) {
     const resolver = async (args: any) => {
-      const entityIdField = `${entityType.name.toLowerCase()}Id`;
+      const entityIdField = 'id';
       const id = args[entityIdField];
       if (!id) return null;
       const entity = await this.entityRepository.fetchById(entityType.name, id);

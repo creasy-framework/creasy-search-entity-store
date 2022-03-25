@@ -78,7 +78,7 @@ export class EntitySchema {
   }
 
   getIdField(): string {
-    return this.entitySchema.idField || `${camelCase(this.getEntityType())}Id`;
+    return 'id';
   }
 
   toJson() {

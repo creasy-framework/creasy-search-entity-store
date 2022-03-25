@@ -217,25 +217,25 @@ describe('EntityStoreRepository', () => {
       expect(mockModel.create).toHaveBeenCalledWith(doc);
     });
     it('updateEntity should update entity with right filter', async () => {
-      const doc = { userId: '1' };
+      const doc = { id: '1' };
       await repository.updateEntity('User', '1', doc);
       expect(repository.getModelMeta).toHaveBeenCalledWith('User');
       expect(mockModel.updateOne).toHaveBeenCalledWith(
-        { userId: '1' },
+        { id: '1' },
         { $set: doc },
       );
     });
     it('fetchById should find entity with right filter', async () => {
       const entity = await repository.fetchById('User', '1');
       expect(repository.getModelMeta).toHaveBeenCalledWith('User');
-      expect(mockModel.findOne).toHaveBeenCalledWith({ userId: '1' });
+      expect(mockModel.findOne).toHaveBeenCalledWith({ id: '1' });
       expect(entity).toEqual(entity1);
     });
     it('fetchByIds should find entities with right filter', async () => {
       const entities = await repository.fetchByIds('User', ['1', '2']);
       expect(repository.getModelMeta).toHaveBeenCalledWith('User');
       expect(mockModel.find).toHaveBeenCalledWith({
-        userId: { $in: ['1', '2'] },
+        id: { $in: ['1', '2'] },
       });
       expect(entities).toEqual([entity1, entity2]);
     });

@@ -1,9 +1,7 @@
 import { EntitySchema } from './EntitySchema';
 import { JSONSchema7 } from 'json-schema';
 
-export type EntityJSONSchema = JSONSchema7 & {
-  idField?: string;
-};
+export type EntityJSONSchema = JSONSchema7;
 
 export type EntityJSONSchemaPrimitiveType =
   | 'string'

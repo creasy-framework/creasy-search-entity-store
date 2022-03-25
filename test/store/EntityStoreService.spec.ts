@@ -17,7 +17,7 @@ describe('EntityStoreService', () => {
     fingerprint: '',
   });
 
-  const entity = { userId: '1' };
+  const entity = { id: '1' };
 
   beforeEach(() => {
     entityStoreRepository = {
