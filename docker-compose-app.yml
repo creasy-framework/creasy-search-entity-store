@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  entity-store:
+    container_name: creasy-entity-store
+    image: node:16
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: bash -c "yarn install && yarn start:dev"
+    environment:
+      ENTITY_STORE_DB_HOST: mongodb://mongo:27017/entity-store
+      KAFKA_BROKERS: kafka:9092
+      CACHE_HOST: cache
+    ports:
+      - "3000:3000"
+networks:
+  default:
+    external:
+      name: creasy-network

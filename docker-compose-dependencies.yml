@@ -23,9 +23,9 @@ services:
     expose:
       - "9093"
     environment:
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://creasy-kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://creasy-kafka:9093,OUTSIDE://kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_LISTENERS: INSIDE://kafka:9093,OUTSIDE://kafka:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPICS: "topic_test:1:1"
@@ -37,6 +37,7 @@ services:
     ports:
       - "6379:6379"
   kafdrop:
+    container_name: kafdrop
     image: obsidiandynamics/kafdrop
     environment:
       JVM_OPTS: "-Xms32M -Xmx64M"
@@ -46,3 +47,6 @@ services:
       - "9000:9000"
     links:
       - kafka
+networks:
+  default:
+    name: creasy-network
