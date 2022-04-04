@@ -3,8 +3,10 @@ import {
   EntityStoreGraphQLSchemaPrimitiveField,
   EntityStoreGraphQLSchemaRefField,
   EntityStoreGraphQLSchemaQueryField,
+  GRAPHQL_SCHEMA_FIELD_INDENT,
 } from '../../src/graphql';
 import { EntitySchemaField } from '../../src/schema';
+import { EOL } from 'os';
 
 describe('EntityStoreGraphQLSchemaType', () => {
   describe('EntityStoreGraphQLSchemaPrimitiveField', () => {
@@ -72,9 +74,9 @@ describe('EntityStoreGraphQLSchemaType', () => {
     it('toString() should return correct query field', () => {
       const field = new EntityStoreGraphQLSchemaQueryField(
         'User',
-        new EntitySchemaField('userId', { type: 'string' }),
+        new EntitySchemaField('id', { type: 'string' }),
       );
-      const expected = 'user(userId: String): User';
+      const expected = `user(id: String): User${EOL}${GRAPHQL_SCHEMA_FIELD_INDENT}userList(ids: [String]): [User]`;
       expect(field.toString()).toBe(expected);
     });
   });

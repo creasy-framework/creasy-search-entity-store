@@ -1,6 +1,10 @@
 import camelCase from 'camelcase';
 import { EntityJSONSchemaPrimitiveType, EntitySchemaField } from '../schema';
-import { DEPENDENT_FIELD_SEPARATOR } from './Constants';
+import {
+  DEPENDENT_FIELD_SEPARATOR,
+  GRAPHQL_SCHEMA_FIELD_INDENT,
+} from './Constants';
+import { EOL } from 'os';
 
 export abstract class EntityStoreGraphQLSchemaTypeField {
   protected entitySchemaField: EntitySchemaField;
@@ -23,9 +27,15 @@ export class EntityStoreGraphQLSchemaQueryField extends EntityStoreGraphQLSchema
     const argumentType = this.mapPrimitiveType(
       this.entitySchemaField.getType(),
     );
-    return `${camelCase(this.entityType)}(${argumentName}: ${argumentType}): ${
-      this.entityType
-    }`;
+    const simpleQuery = `${camelCase(
+      this.entityType,
+    )}(${argumentName}: ${argumentType}): ${this.entityType}`;
+
+    const batchQuery = `${camelCase(
+      this.entityType,
+    )}List(${argumentName}s: [${argumentType}]): [${this.entityType}]`;
+
+    return `${simpleQuery}${EOL}${GRAPHQL_SCHEMA_FIELD_INDENT}${batchQuery}`;
   }
 }
 

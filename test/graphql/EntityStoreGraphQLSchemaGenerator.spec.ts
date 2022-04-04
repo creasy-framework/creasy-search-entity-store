@@ -24,7 +24,9 @@ describe('EntityStoreGraphQLSchemaGenerator', () => {
     const expected = `# Version: 1-2
 type Query {
   user(id: String): User
+  userList(ids: [String]): [User]
   organization(id: String): Organization
+  organizationList(ids: [String]): [Organization]
 }
 type User {
   id: String

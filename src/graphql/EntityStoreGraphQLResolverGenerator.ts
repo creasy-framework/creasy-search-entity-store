@@ -186,10 +186,48 @@ export class EntityStoreGraphQLResolverGenerator {
     return resolver;
   }
 
+  private createEntityListResolverForType(
+    entityType: GraphQLObjectType,
+    entityTypes: GraphQLObjectType[],
+  ) {
+    const resolver = async (args: any) => {
+      const entityIdsField = 'ids';
+      const ids = args[entityIdsField];
+      if (!ids || ids.length === 0) return null;
+      const entities = await this.entityRepository.fetchByIds(
+        entityType.name,
+        ids,
+      );
+      if (!entities || entities.length === 0) return null;
+      const refs = this.getRefFields(entityType, entityTypes);
+      return entities.map((entity) => {
+        const nestedResolvers = refs.reduce((next, ref) => {
+          return {
+            ...next,
+            [ref.name]: this.createResolverForField(ref, entityTypes, entity),
+          };
+        }, {});
+        return {
+          ...entity,
+          ...nestedResolvers,
+        };
+      });
+    };
+    return resolver;
+  }
+
   generate = (entityTypes: GraphQLObjectType[]): EntityResolver => {
     const root = entityTypes.reduce((next, current) => {
-      const resolver = this.createResolverForType(current, entityTypes);
-      return { [current.name.toLowerCase()]: resolver, ...next };
+      const singleResolver = this.createResolverForType(current, entityTypes);
+      const listResolver = this.createEntityListResolverForType(
+        current,
+        entityTypes,
+      );
+      return {
+        [current.name.toLowerCase()]: singleResolver,
+        [`${current.name.toLowerCase()}List`]: listResolver,
+        ...next,
+      };
     }, {});
     return root;
   };
