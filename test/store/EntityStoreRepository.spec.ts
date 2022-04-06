@@ -225,10 +225,21 @@ describe('EntityStoreRepository', () => {
         { $set: doc },
       );
     });
+    it('deleteEntity should mark entity as deleted', async () => {
+      await repository.deleteEntity('User', '1');
+      expect(repository.getModelMeta).toHaveBeenCalledWith('User');
+      expect(mockModel.updateOne).toHaveBeenCalledWith(
+        { id: '1' },
+        { $set: { __isDeleted: true } },
+      );
+    });
     it('fetchById should find entity with right filter', async () => {
       const entity = await repository.fetchById('User', '1');
       expect(repository.getModelMeta).toHaveBeenCalledWith('User');
-      expect(mockModel.findOne).toHaveBeenCalledWith({ id: '1' });
+      expect(mockModel.findOne).toHaveBeenCalledWith({
+        id: '1',
+        __isDeleted: false,
+      });
       expect(entity).toEqual(entity1);
     });
     it('fetchByIds should find entities with right filter', async () => {
@@ -236,6 +247,7 @@ describe('EntityStoreRepository', () => {
       expect(repository.getModelMeta).toHaveBeenCalledWith('User');
       expect(mockModel.find).toHaveBeenCalledWith({
         id: { $in: ['1', '2'] },
+        __isDeleted: false,
       });
       expect(entities).toEqual([entity1, entity2]);
     });
@@ -248,6 +260,7 @@ describe('EntityStoreRepository', () => {
       expect(repository.getModelMeta).toHaveBeenCalledWith('User');
       expect(mockModel.find).toHaveBeenCalledWith({
         organizationIds: '2',
+        __isDeleted: false,
       });
       expect(entities).toEqual([entity1, entity2]);
     });

@@ -8,20 +8,23 @@ import { ENTITY_SCHEMA_TYPE_MAP } from './Constants';
 export class EntitySchemaMapper {
   map(entitySchema: EntitySchema) {
     return new Schema(
-      entitySchema
-        .getFields()
-        .reduce(
-          (definition: SchemaDefinition<SchemaDefinitionType<any>>, field) => {
-            return {
-              ...definition,
-              [field.getName()]: {
-                type: this.mapType(field),
-                default: undefined,
-              },
-            };
+      entitySchema.getFields().reduce(
+        (definition: SchemaDefinition<SchemaDefinitionType<any>>, field) => {
+          return {
+            ...definition,
+            [field.getName()]: {
+              type: this.mapType(field),
+              default: undefined,
+            },
+          };
+        },
+        {
+          __isDeleted: {
+            type: Schema.Types.Boolean,
+            default: false,
           },
-          {},
-        ),
+        },
+      ),
     );
   }
 

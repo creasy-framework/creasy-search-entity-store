@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   HttpStatus,
   Param,
   Post,
@@ -37,13 +38,30 @@ export class EntityStoreController {
           data: entity,
         }),
       });
+      response.status(HttpStatus.ACCEPTED).send();
     } else {
       await this.entityStoreService.saveEntity(
         entity,
         entityType,
         correlationId,
       );
+      response.status(HttpStatus.OK).send();
     }
-    response.status(HttpStatus.ACCEPTED).send();
+  }
+
+  @Delete(':type/:entityId')
+  async deleteEntity(
+    @Param('type') entityType: string,
+    @Param('entityId') entityId: string,
+    @Res() response: Response,
+    @Req() request: Request,
+  ): Promise<void> {
+    const correlationId: string = request.headers['x-correlation-id'] as string;
+    await this.entityStoreService.deleteEntity(
+      entityId,
+      entityType,
+      correlationId,
+    );
+    response.status(HttpStatus.OK).send();
   }
 }

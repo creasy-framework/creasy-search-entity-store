@@ -89,10 +89,20 @@ export class EntityStoreRepository {
     );
   }
 
+  async deleteEntity(entityType: string, entityId: string) {
+    const { model, entitySchema } = await this.getModelMeta(entityType);
+    const idField = entitySchema.getIdField();
+    await model.updateOne(
+      { [idField]: entityId },
+      { $set: { __isDeleted: true } },
+    );
+  }
+
   async fetchById(entityType: string, entityId: string | number): Promise<any> {
     const { model, entitySchema } = await this.getModelMeta(entityType);
     const doc: any = await model.findOne({
       [entitySchema.getIdField()]: entityId,
+      __isDeleted: false,
     });
     return this.wash(doc);
   }
@@ -104,6 +114,7 @@ export class EntityStoreRepository {
     const { model, entitySchema } = await this.getModelMeta(entityType);
     const docs = await model.find({
       [entitySchema.getIdField()]: { $in: ids },
+      __isDeleted: false,
     });
     return docs.map((doc) => this.wash(doc));
   }
@@ -114,7 +125,7 @@ export class EntityStoreRepository {
     refId: string | number,
   ): Promise<any[]> {
     const { model } = await this.getModelMeta(entityType);
-    const docs = await model.find({ [refFieldName]: refId });
+    const docs = await model.find({ [refFieldName]: refId, __isDeleted: false, });
     return docs.map((doc) => this.wash(doc));
   }
 
@@ -125,6 +136,11 @@ export class EntityStoreRepository {
       this.connection.db
         .collection(this.getCollectionName(entityType))
         .createIndex({ [entitySchema.getIdField()]: 1 }),
+    );
+    promises.push(
+      this.connection.db
+        .collection(this.getCollectionName(entityType))
+        .createIndex({ __isDeleted: 1 }),
     );
     const refs = entitySchema.getFields().filter((f) => f.isRefField());
     refs.forEach((ref) => {

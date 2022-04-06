@@ -17,5 +17,7 @@ describe('EntitySchemaMapper', () => {
     expect(docSchema.obj.id.type).toEqual(Schema.Types.String);
     expect(docSchema.obj.reportToUserId.type).toEqual(Schema.Types.String);
     expect(docSchema.obj.organizationIds.type).toEqual([Schema.Types.String]);
+    expect(docSchema.obj.__isDeleted.type).toEqual(Schema.Types.Boolean);
+    expect(docSchema.obj.__isDeleted.default).toEqual(false);
   });
 });

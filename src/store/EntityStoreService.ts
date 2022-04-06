@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { EntityStoreRepository } from './EntityStoreRepository';
-import { ENTITY_PUBLISHED_EVENT, EventService } from '../event';
+import {
+  ENTITY_PUBLISHED_EVENT,
+  ENTITY_REMOVED_EVENT,
+  EventService,
+} from '../event';
 
 @Injectable()
 export class EntityStoreService {
@@ -20,6 +24,17 @@ export class EntityStoreService {
       await this.repository.insertEntity(entityType, entity);
     }
     await this.eventService.emit(ENTITY_PUBLISHED_EVENT, {
+      key: entityType,
+      value: JSON.stringify({
+        correlationId,
+        data: { entityType, id: entityId },
+      }),
+    });
+  }
+
+  async deleteEntity(entityId: any, entityType: string, correlationId: string) {
+    await this.repository.deleteEntity(entityType, entityId);
+    await this.eventService.emit(ENTITY_REMOVED_EVENT, {
       key: entityType,
       value: JSON.stringify({
         correlationId,
