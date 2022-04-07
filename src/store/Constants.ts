@@ -14,3 +14,8 @@ export const ENTITY_SCHEMA_TYPE_MAP = {
 
 export const LATEST_ENTITY_SCHEMA_VERSION_CACHE_KEY =
   'LATEST_ENTITY_SCHEMA_VERSION_';
+
+export enum ENTITY_MUTATION_TYPE {
+  UPSERT = 'upsert',
+  REMOVE = 'remove',
+}

@@ -1,7 +1,7 @@
 import { EntityStoreService } from '../../src/store/EntityStoreService';
 import userSchema from '../__fixtures/entity-schemas/user-schema.json';
 import { EntityJSONSchema, EntitySchema } from '../../src/schema';
-import { ENTITY_PUBLISHED_EVENT, ENTITY_REMOVED_EVENT } from '../../src/event';
+import { ENTITY_CHANGED_EVENT } from '../../src/event';
 
 describe('EntityStoreService', () => {
   let entityStoreService;
@@ -49,9 +49,10 @@ describe('EntityStoreService', () => {
         'User',
         entity,
       );
-      expect(eventService.emit).toHaveBeenCalledWith(ENTITY_PUBLISHED_EVENT, {
+      expect(eventService.emit).toHaveBeenCalledWith(ENTITY_CHANGED_EVENT, {
         key: 'User',
-        value: '{"data":{"entityType":"User","id":"1"}}',
+        value:
+          '{"data":{"entityType":"User","id":"1","mutationType":"upsert"}}',
       });
     });
 
@@ -63,9 +64,10 @@ describe('EntityStoreService', () => {
         '1',
         entity,
       );
-      expect(eventService.emit).toHaveBeenCalledWith(ENTITY_PUBLISHED_EVENT, {
+      expect(eventService.emit).toHaveBeenCalledWith(ENTITY_CHANGED_EVENT, {
         key: 'User',
-        value: '{"data":{"entityType":"User","id":"1"}}',
+        value:
+          '{"data":{"entityType":"User","id":"1","mutationType":"upsert"}}',
       });
     });
 
@@ -78,16 +80,17 @@ describe('EntityStoreService', () => {
   });
 
   describe('deleteEntity', () => {
-    it('deleteEntity should call insertEntity if no entity found', async () => {
+    it('deleteEntity should call deleteEntity and emit event', async () => {
       existing = null;
       await entityStoreService.deleteEntity('1', 'User');
       expect(entityStoreRepository.deleteEntity).toHaveBeenCalledWith(
         'User',
         '1',
       );
-      expect(eventService.emit).toHaveBeenCalledWith(ENTITY_REMOVED_EVENT, {
+      expect(eventService.emit).toHaveBeenCalledWith(ENTITY_CHANGED_EVENT, {
         key: 'User',
-        value: '{"data":{"entityType":"User","id":"1"}}',
+        value:
+          '{"data":{"entityType":"User","id":"1","mutationType":"remove"}}',
       });
     });
   });
