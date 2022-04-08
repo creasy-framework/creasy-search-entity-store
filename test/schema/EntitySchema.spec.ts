@@ -1,8 +1,5 @@
 import userSchema from '../__fixtures/entity-schemas/user-schema.json';
-import {
-  EntitySchema,
-  EntityJSONSchema,
-} from '../../src/schema';
+import { EntitySchema, EntityJSONSchema } from '../../src/schema';
 
 describe('EntitySchema', () => {
   const createdAt = Date.now();

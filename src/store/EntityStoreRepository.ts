@@ -125,7 +125,10 @@ export class EntityStoreRepository {
     refId: string | number,
   ): Promise<any[]> {
     const { model } = await this.getModelMeta(entityType);
-    const docs = await model.find({ [refFieldName]: refId, __isDeleted: false, });
+    const docs = await model.find({
+      [refFieldName]: refId,
+      __isDeleted: false,
+    });
     return docs.map((doc) => this.wash(doc));
   }
 

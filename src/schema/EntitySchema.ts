@@ -1,4 +1,3 @@
-import camelCase from 'camelcase';
 import { EntitySchemaField } from './EntitySchemaField';
 import { EntityJSONSchema, EntityJSONSchemaField } from './Types';
 import { EntitySchemaDocument } from './EntitySchemaDocument';

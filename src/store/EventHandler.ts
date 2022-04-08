@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { EntityStoreService } from './EntityStoreService';
 import {
   ENTITY_SCHEMA_UPDATE_EVENT,
