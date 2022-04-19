@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/rivneglee/creasy-search-entity-store/tree/master.svg?style=svg&circle-token=f57bf1c49a811624fb5fc0d5bb4a01aed8c14cd0)](https://circleci.com/gh/rivneglee/creasy-search-entity-store/tree/master)
+[![CircleCI](https://circleci.com/gh/creasy-framework/creasy-search-entity-store/tree/master.svg?style=svg&circle-token=35e9dcdadc4577885776142e15b707398c75185e)](https://circleci.com/gh/creasy-framework/creasy-search-entity-store/tree/master)
 
 ## Platform Architecture
 
